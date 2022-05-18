@@ -87,6 +87,18 @@
                 text-align: center;
                 margin-top: 10px;
             }
+
+            .tbl-info-credito {
+                width: 100%;
+                font-size: 6px;
+                border: 1px solid black;
+            }
+
+            .tbl-info-retencion {
+                width: 100%;
+                font-size: 6px;
+                border: 1px solid black;
+            }
             /*---------------------------------------------*/
 
             .m-0{
@@ -228,6 +240,16 @@
                         <th colspan="4" style="text-align:right">IGV: S/.</th>
                         <th style="text-align:right">{{ number_format($documento->total_igv, 2) }}</th>
                     </tr>
+                    @if (!empty($documento->retencion))
+                    <tr>
+                        <th colspan="4" style="text-align:right">Total: S/.</th>
+                        <th style="text-align:right">{{ number_format($documento->total + $documento->retencion->impRetenido, 2) }}</th>
+                    </tr>
+                    <tr>
+                        <th colspan="4" style="text-align:right">Imp. Retenido: S/.</th>
+                        <th style="text-align:right">{{ number_format($documento->retencion->impRetenido, 2) }}</th>
+                    </tr>  
+                    @endif
                     <tr>
                         <th colspan="4" style="text-align:right">Total a pagar: S/.</th>
                         <th style="text-align:right">{{ number_format($documento->total, 2) }}</th>
@@ -252,6 +274,58 @@
                     </td>
                 </tr>
             </table>
+            @if (strtoupper($documento->condicion->descripcion) == 'CREDITO' || strtoupper($documento->condicion->descripcion) == 'CRÉDITO')
+                <br>
+                <div style="border: 1px solid black; padding: 2px">
+                    <table class="tbl-info-credito" style="margin-bottom: 2px;">
+                        <tr>
+                            <th colspan="3" style="text-align: left">Informacion del crédito</th>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left">Monto neto pendiente de pago</td>
+                            <td>:</td>
+                            <td>S/. {{ number_format($documento->total - $documento->notas->sum('mtoImpVenta'), 2) }}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left">Total de cuotas</td>
+                            <td>:</td>
+                            <td>1</td>
+                        </tr>
+                    </table>
+                    <table class="tbl-info-credito" style="margin-top: 2px;">
+                        <tr>
+                            <th style="text-align: center">N° Cuota</th>
+                            <th style="text-align: center">Fec. Venc.</th>
+                            <th style="text-align: center">Monto</th>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center">1</td>
+                            <td style="text-align: center">{{ $documento->fecha_vencimiento }}</td>
+                            <td style="text-align: center">{{ number_format($documento->total - $documento->notas->sum('mtoImpVenta'), 2) }}</td>
+                        </tr>
+                    </table>
+                </div>
+            @endif
+            @if (!empty($documento->retencion))
+                <div style="border: 1px solid black; padding: 2px; margin-top: 5px;">
+                    <table class="tbl-info-retencion">
+                        <tr>
+                            <th style="text-align: left;">Información de la retención</th>
+                        </tr>
+                        <tr>
+                            <td>
+                                Base imponible de la Retención: &nbsp;&nbsp; S/. {{ number_format($documento->total + $documento->retencion->impRetenido, 2) }}
+                            </td>
+                            <td>
+                                Porcentaje de retención: &nbsp;&nbsp; {{ $documento->clienteEntidad->tasa_retencion }}%
+                            </td>
+                            <td>
+                                Monto de la Retención: &nbsp;&nbsp; S/. {{ number_format($documento->retencion->impRetenido, 2) }}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            @endif
         </div><br>
         <div class="qr">
             @if($documento->ruta_qr)

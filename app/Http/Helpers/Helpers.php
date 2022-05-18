@@ -42,6 +42,7 @@ use App\Notifications\FacturacionNotification;
 use App\Notifications\GuiaNotification;
 use App\Notifications\NotaNotification;
 use App\Notifications\RegularizeNotification;
+use App\Notifications\RetencionNotification;
 use App\Ventas\CuentaCliente;
 use App\Ventas\Documento\Detalle as DocumentoDetalle;
 use App\Ventas\Documento\Documento as DocumentoDocumento;
@@ -804,7 +805,6 @@ if (!function_exists('tokenEmpresa')) {
 }
 
 ////////////////////////////////////////////////
-
 //ENVIAR FACTURA O BOLETA
 //GENERAR PDF
 if (!function_exists('generarComprobanteapi')) {
@@ -915,6 +915,95 @@ if (!function_exists('enviarComprobanteapi')) {
 
         $estado = $response->getStatusCode();
 
+        if ($estado == '200') {
+
+            $resultado = $response->getBody()->getContents();
+            json_decode($resultado);
+            return $resultado;
+        }
+    }
+}
+
+////////////////////////////////////////////////
+//ENVIAR COMPROBANTE DE RETENCION
+//ENVIAR A  SUNAT
+if (!function_exists('enviarComprobanteRetencion')) {
+    function enviarComprobanteRetencion($comprobante, $empresa)
+    {
+        $url = "https://facturacion.apisperu.com/api/v1/retention/send";
+        $client = new \GuzzleHttp\Client(['verify' => false]);
+        $token = tokenEmpresa($empresa);
+        $response = $client->post($url, [
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+                'Authorization' => "Bearer {$token}"
+            ],
+            'body'    => $comprobante
+        ]);
+
+        $estado = $response->getStatusCode();
+
+        if ($estado == '200') {
+
+            $resultado = $response->getBody()->getContents();
+            json_decode($resultado);
+            return $resultado;
+        }
+    }
+}
+//GENERAR PDF
+if (!function_exists('generarComprobanteRetencion')) {
+    function generarComprobanteRetencion($comprobante, $empresa)
+    {
+        $url = "https://facturacion.apisperu.com/api/v1/retention/pdf";
+        $client = new \GuzzleHttp\Client(['verify' => false]);
+        $token = tokenEmpresa($empresa);
+        $response = $client->post($url, [
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+                'Authorization' => "Bearer {$token}"
+            ],
+            'body'    => $comprobante
+        ]);
+
+        $estado = $response->getStatusCode();
+
+        return $response->getBody()->getContents();
+
+        dd($response->getBody()->getContents());
+        if ($estado == '200') {
+
+            $resultado = $response->getBody()->getContents();
+            json_decode($resultado);
+            return $resultado;
+        }
+    }
+}
+//GENERAR XML
+if (!function_exists('generarXmlRetencion')) {
+    function generarXmlRetencion($comprobante, $empresa)
+    {
+        $url = "https://facturacion.apisperu.com/api/v1/retention/xml";
+        $client = new \GuzzleHttp\Client(['verify' => false]);
+        $token = tokenEmpresa($empresa);
+        $response = $client->post($url, [
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+                'Authorization' => "Bearer {$token}"
+            ],
+            'body'    => $comprobante
+        ]);
+
+        $estado = $response->getStatusCode();
+
+        return $response->getBody();
+
+
+
+        // dd( $response->getBody()->getContents());
         if ($estado == '200') {
 
             $resultado = $response->getBody()->getContents();
@@ -1877,6 +1966,25 @@ if (!function_exists('refreshNotifications')) {
         $guias = $guias->orderBy('guias_remision.id', 'desc')->get();
         foreach ($guias as $guia) {
             Auth::user()->notify(new GuiaNotification($guia));
+        }
+
+        // Retenciones
+        $retenciones =  DB::table('retencions')
+        ->join('cotizacion_documento', 'retencions.documento_id', '=', 'cotizacion_documento.id')
+        ->select(
+            'retencions.*',
+        )
+        ->where('cotizacion_documento.estado', '!=', 'ANULADO')
+        ->where('retencions.sunat', '0')
+        ->where('cotizacion_documento.sunat', '1');
+
+        if (!PuntoVenta() && !FullAccess()) {
+            $retenciones = $retenciones->where('cotizacion_documento.user_id', Auth::user()->id);
+        }
+
+        $retenciones = $retenciones->orderBy('cotizacion_documento.id', 'desc')->get();
+        foreach ($retenciones as $retencion) {
+            Auth::user()->notify(new RetencionNotification($retencion));
         }
     }
 }

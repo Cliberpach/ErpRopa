@@ -1999,6 +1999,23 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -2009,7 +2026,8 @@ __webpack_require__.r(__webpack_exports__);
       lstNotifyEnvio: [],
       lstNotifyRegularize: [],
       lstNotifyNotas: [],
-      lstNotifyGuias: []
+      lstNotifyGuias: [],
+      lstNotifyRetenciones: []
     };
   },
   mounted: function mounted() {
@@ -2038,6 +2056,9 @@ __webpack_require__.r(__webpack_exports__);
         _this.lstNotifyGuias = data.notifications.filter(function (notify) {
           return notify.data.head == 'guia';
         });
+        _this.lstNotifyRetenciones = data.notifications.filter(function (notify) {
+          return notify.data.head == 'retencion';
+        });
       });
     },
     locationEnvio: function locationEnvio() {
@@ -2051,6 +2072,9 @@ __webpack_require__.r(__webpack_exports__);
     },
     locationGuias: function locationGuias() {
       window.location = route('consultas.ventas.alerta.guias');
+    },
+    locationRetenciones: function locationRetenciones() {
+      window.location = route('consultas.ventas.alerta.retenciones');
     }
   },
   updated: function updated() {
@@ -57718,6 +57742,81 @@ var render = function() {
           ])
         }),
         _vm._v(" "),
+        _vm.lstNotifyRetenciones.length > 0 &&
+        (_vm.lstNotifyRegularize.length > 0 ||
+          _vm.lstNotifyEnvio.length > 0 ||
+          _vm.lstNotifyNotas.length > 0 ||
+          _vm.lstNotifyGuias > 0)
+          ? _c("li", { staticClass: "dropdown-divider" })
+          : _vm._e(),
+        _vm._v(" "),
+        _vm.lstNotifyRetenciones.length > 0
+          ? _c("li", [
+              _c(
+                "a",
+                {
+                  staticClass: "dropdown-item",
+                  attrs: { href: "#" },
+                  on: {
+                    click: function($event) {
+                      return _vm.locationRetenciones()
+                    }
+                  }
+                },
+                [
+                  _c("div", { staticClass: "content-alert text-center" }, [
+                    _c("b", [
+                      _vm._v(
+                        _vm._s(_vm.lstNotifyRetenciones.length) +
+                          " " +
+                          _vm._s(
+                            _vm.lstNotifyRetenciones.length > 1
+                              ? "notificaciones"
+                              : "notificacion"
+                          ) +
+                          " de retenciones"
+                      )
+                    ])
+                  ])
+                ]
+              )
+            ])
+          : _vm._e(),
+        _vm._v(" "),
+        _vm._l(_vm.lstNotifyRetenciones, function(notify) {
+          return _c("li", { key: notify.id }, [
+            _c(
+              "a",
+              {
+                staticClass: "dropdown-item",
+                attrs: { href: "#" },
+                on: {
+                  click: function($event) {
+                    return _vm.locationRetenciones()
+                  }
+                }
+              },
+              [
+                _c("div", { staticClass: "content-alert" }, [
+                  _c("i", { staticClass: "fa fa-envelope fa-fw text-danger" }),
+                  _vm._v(
+                    " Retención por enviar: " +
+                      _vm._s(
+                        notify.data.body.serie +
+                          " - " +
+                          notify.data.body.correlativo
+                      ) +
+                      "\n                    "
+                  ),
+                  _c("span", { staticClass: "float-right text-muted small" }, [
+                    _vm._v(_vm._s(notify.data.time))
+                  ])
+                ])
+              ]
+            )
+          ])
+        }),
+        _vm._v(" "),
         _vm.notifyCount == 0 ? _c("li", [_vm._m(0)]) : _vm._e()
       ],
       2
@@ -70151,7 +70250,7 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! D:\ErpInversionesPintoFile\ErpInversionesPinto\resources\js\appNotify.js */"./resources/js/appNotify.js");
+module.exports = __webpack_require__(/*! D:\ERP-ROPA\ErpRopa\resources\js\appNotify.js */"./resources/js/appNotify.js");
 
 
 /***/ })

@@ -55,8 +55,8 @@ class ClienteController extends Controller
 
         $rules = [
             'tipo_documento' => 'required',
-            'documento' => ['required','numeric', Rule::unique('clientes','documento')->where(function ($query) {
-                $query->whereIn('estado',["ACTIVO"]);
+            'documento' => ['required', 'numeric', Rule::unique('clientes', 'documento')->where(function ($query) {
+                $query->whereIn('estado', ["ACTIVO"]);
             })],
             'nombre' => 'required',
             'tipo_cliente' => 'required',
@@ -90,7 +90,11 @@ class ClienteController extends Controller
 
         Validator::make($data, $rules, $message)->validate();
         $arrayDatos = $request->all();
-        if ($arrayDatos['fecha_aniversario']=="-"){ unset($arrayDatos['fecha_aniversario']); }else{$arrayDatos['fecha_aniversario']= Carbon::createFromFormat('d/m/Y', $arrayDatos['fecha_aniversario'])->format('Y-m-d');}
+        if ($arrayDatos['fecha_aniversario'] == "-") {
+            unset($arrayDatos['fecha_aniversario']);
+        } else {
+            $arrayDatos['fecha_aniversario'] = Carbon::createFromFormat('d/m/Y', $arrayDatos['fecha_aniversario'])->format('Y-m-d');
+        }
         $cliente = new Cliente($arrayDatos);
         $cliente->tipo_documento = $request->get('tipo_documento');
 
@@ -121,9 +125,9 @@ class ClienteController extends Controller
         $cliente->nombre_propietario = $request->get('nombre_propietario');
         $cliente->direccion_propietario = $request->get('direccion_propietario');
 
-        if ( $request->get('fecha_nacimiento_prop') != "-") {
+        if ($request->get('fecha_nacimiento_prop') != "-") {
             $cliente->fecha_nacimiento_prop  = Carbon::createFromFormat('d/m/Y', $request->get('fecha_nacimiento_prop'))->format('Y-m-d');
-        }else{
+        } else {
             $cliente->fecha_nacimiento_prop  = NULL;
         }
 
@@ -131,11 +135,15 @@ class ClienteController extends Controller
         $cliente->correo_propietario  = $request->get('correo_propietario');
 
         //Latitud y longitud
-        $cliente->lat= $request->get('lat');
-        $cliente->lng= $request->get('lng');
+        $cliente->lat = $request->get('lat');
+        $cliente->lng = $request->get('lng');
+
+        $cliente->agente_retencion = $request->get('retencion');
+        $cliente->tasa_retencion = $request->get('tasa_retencion');
+        $cliente->monto_mayor = $request->get('monto_mayor');
 
         //Img Gps
-        if($request->hasFile('logo')){
+        if ($request->hasFile('logo')) {
             $file = $request->file('logo');
             $name = $file->getClientOriginalName();
             $cliente->nombre_logo = $name;
@@ -145,11 +153,11 @@ class ClienteController extends Controller
         $cliente->save();
 
         //Registro de actividad
-        $descripcion = "SE AGREGÓ EL CLIENTE CON EL NOMBRE: ". $cliente->nombre;
+        $descripcion = "SE AGREGÓ EL CLIENTE CON EL NOMBRE: " . $cliente->nombre;
         $gestion = "CLIENTES";
-        crearRegistro($cliente, $descripcion , $gestion);
+        crearRegistro($cliente, $descripcion, $gestion);
 
-        Session::flash('success','Cliente creado.');
+        Session::flash('success', 'Cliente creado.');
         return redirect()->route('ventas.cliente.index')->with('guardar', 'success');
     }
 
@@ -172,8 +180,8 @@ class ClienteController extends Controller
 
         $rules = [
             'tipo_documento' => 'required',
-            'documento' => ['required','numeric', Rule::unique('clientes','documento')->where(function ($query) {
-                $query->whereIn('estado',["ACTIVO"]);
+            'documento' => ['required', 'numeric', Rule::unique('clientes', 'documento')->where(function ($query) {
+                $query->whereIn('estado', ["ACTIVO"]);
             })->ignore($id)],
             'nombre' => 'required',
             'zona' => 'required',
@@ -226,7 +234,7 @@ class ClienteController extends Controller
         $cliente->telefono_fijo = $request->get('telefono_fijo');
 
         $cliente->direccion_negocio = $request->get('direccion_negocio');
-        if($request->get('fecha_aniversario')!="-"){
+        if ($request->get('fecha_aniversario') != "-") {
             $cliente->fecha_aniversario = Carbon::createFromFormat('d/m/Y', $request->get('fecha_aniversario'))->format('Y-m-d');
         }
         $cliente->activo = $request->get('activo');
@@ -244,9 +252,9 @@ class ClienteController extends Controller
 
 
 
-        if ( $request->get('fecha_nacimiento_prop') != "-") {
+        if ($request->get('fecha_nacimiento_prop') != "-") {
             $cliente->fecha_nacimiento_prop  = Carbon::createFromFormat('d/m/Y', $request->get('fecha_nacimiento_prop'))->format('Y-m-d');
-        }else{
+        } else {
             $cliente->fecha_nacimiento_prop  = NULL;
         }
 
@@ -255,11 +263,15 @@ class ClienteController extends Controller
         $cliente->correo_propietario  = $request->get('correo_propietario');
 
         //Latitud y longitud
-        $cliente->lat= $request->get('lat');
-        $cliente->lng= $request->get('lng');
+        $cliente->lat = $request->get('lat');
+        $cliente->lng = $request->get('lng');
+
+        $cliente->agente_retencion = $request->get('retencion');
+        $cliente->tasa_retencion = $request->get('tasa_retencion');
+        $cliente->monto_mayor = $request->get('monto_mayor');
 
         //Imagen cliente gps
-        if($request->hasFile('logo')){
+        if ($request->hasFile('logo')) {
             Storage::delete($cliente->ruta_logo);
             $file = $request->file('logo');
             $name = $file->getClientOriginalName();
@@ -269,11 +281,11 @@ class ClienteController extends Controller
         $cliente->update();
 
         //Registro de actividad
-        $descripcion = "SE MODIFICÓ EL CLIENTE CON EL NOMBRE: ". $cliente->nombre;
+        $descripcion = "SE MODIFICÓ EL CLIENTE CON EL NOMBRE: " . $cliente->nombre;
         $gestion = "CLIENTES";
-        modificarRegistro($cliente, $descripcion , $gestion);
+        modificarRegistro($cliente, $descripcion, $gestion);
 
-        Session::flash('success','Cliente modificado.');
+        Session::flash('success', 'Cliente modificado.');
         return redirect()->route('ventas.cliente.index')->with('guardar', 'success');
     }
 

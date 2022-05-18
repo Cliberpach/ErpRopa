@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 use App\Mantenimiento\Tabla\Detalle as TablaDetalle;
 use App\Ventas\CuentaCliente;
+use App\Ventas\RetencionDetalle;
 
 class Documento extends Model
 {
@@ -68,6 +69,10 @@ class Documento extends Model
         'getRegularizeResponse_contingencia'
     ];
 
+    public function retencion()
+    {
+        return $this->hasOne(RetencionDetalle::class, 'documento_id', 'id');
+    }
 
 
     public function detalles()

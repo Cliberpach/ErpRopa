@@ -18,6 +18,7 @@ use App\Pos\MovimientoCaja;
 use App\Ventas\Cliente;
 use App\Mantenimiento\Condicion;
 use App\Mantenimiento\Empresa\Banco;
+use App\Mantenimiento\Ubigeo\Distrito;
 use App\Notifications\FacturacionNotification;
 use App\Ventas\Cotizacion;
 use App\Ventas\CotizacionDetalle;
@@ -33,6 +34,8 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Barryvdh\DomPDF\Facade as PDF;
 use App\Ventas\ErrorVenta;
+use App\Ventas\Retencion;
+use App\Ventas\RetencionDetalle;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Exception;
 use Illuminate\Database\Query\JoinClause;
@@ -491,10 +494,10 @@ class DocumentoController extends Controller
                 $cantidadDetalle = $lotes->where('producto', $detalle->producto_id)->sum('cantidad');
                 if ($cantidadDetalle != $detalle->cantidad) {
                     $devolucion = true;
-                    $devolucionLotes = $lotes->where('producto', $detalle->producto_id)->first();
+                    $devolucionLotes = $lotes->where('producto', $detalle->producto_id);
                     //LLENAR ERROR CANTIDAD SOLICITADA MAYOR AL STOCK
                     $coll = new Collection();
-                    $coll->producto = $devolucionLotes->descripcion_producto;
+                    $coll->producto = $devolucionLotes[0]->descripcion_producto;
                     $coll->cantidad = $detalle->cantidad;
                     $errores->push($coll);
                     self::devolverCantidad($lotes->where('producto', $detalle->producto_id));
@@ -550,11 +553,13 @@ class DocumentoController extends Controller
     public function devolverCantidad($devoluciones)
     {
         foreach ($devoluciones as $devolucion) {
-            $lote = LoteProducto::findOrFail($devolucion->producto_id);
-            $lote->cantidad_logica = $lote->cantidad_logica + $devolucion->cantidad;
-            $lote->cantidad =  $lote->cantidad_logica;
-            $lote->estado = '1';
-            $lote->update();
+            if ($devolucion->producto_id != 0) {
+                $lote = LoteProducto::findOrFail($devolucion->producto_id);
+                $lote->cantidad_logica = $lote->cantidad_logica + $devolucion->cantidad;
+                $lote->cantidad =  $lote->cantidad_logica;
+                $lote->estado = '1';
+                $lote->update();
+            }
         }
     }
 
@@ -570,39 +575,17 @@ class DocumentoController extends Controller
             //INICIO CON LA CANTIDAD DEL DETALLE
             $cantidadSolicitada = $detalle->cantidad;
 
-            foreach ($lotes as $lote) {
-                //SE OBTUVO LA CANTIDAD SOLICITADA DEL LOTE
-                if ($cantidadSolicitada > 0) {
-                    //CANTIDAD LOGICA DEL LOTE ES IGUAL A LA CANTIDAD SOLICITADA
-                    $cantidadLogica = $lote->cantidad_logica;
-                    if ($cantidadLogica == $cantidadSolicitada) {
-                        //CREAMOS EL NUEVO DETALLE
-                        $coll = new Collection();
-                        $coll->producto_id = $lote->id;
-                        $coll->cantidad = $lote->cantidad_logica;
-                        $coll->precio_unitario = $detalle->precio_unitario;
-                        $coll->precio_inicial = $detalle->precio_inicial;
-                        $coll->precio_nuevo = $detalle->precio_nuevo;
-                        $coll->descuento = $detalle->descuento;
-                        $coll->dinero = $detalle->dinero;
-                        $coll->valor_unitario = $detalle->valor_unitario;
-                        $coll->valor_venta = $detalle->valor_venta;
-                        $coll->unidad = $lote->producto->medidaCompleta();
-                        $coll->descripcion_producto = $lote->producto->nombre . ' - ' . $lote->codigo_lote;
-                        $coll->presentacion = $lote->producto->medida;
-                        $coll->producto = $lote->producto->id;
-                        $nuevoDetalle->push($coll);
-                        //ACTUALIZAMOS EL LOTE
-                        $lote->cantidad_logica = $lote->cantidad_logica - $cantidadSolicitada;
-                        //REDUCIMOS LA CANTIDAD SOLICITADA
-                        $cantidadSolicitada = 0;
-                        $lote->update();
-                    } else {
-                        if ($lote->cantidad_logica < $cantidadSolicitada) {
+            if (count($lotes) > 0) {
+                foreach ($lotes as $lote) {
+                    //SE OBTUVO LA CANTIDAD SOLICITADA DEL LOTE
+                    if ($cantidadSolicitada > 0) {
+                        //CANTIDAD LOGICA DEL LOTE ES IGUAL A LA CANTIDAD SOLICITADA
+                        $cantidadLogica = $lote->cantidad_logica;
+                        if ($cantidadLogica == $cantidadSolicitada) {
                             //CREAMOS EL NUEVO DETALLE
                             $coll = new Collection();
                             $coll->producto_id = $lote->id;
-                            $coll->cantidad = $lote->cantidad_logica;
+                            $coll->cantidad = $cantidadSolicitada;
                             $coll->precio_unitario = $detalle->precio_unitario;
                             $coll->precio_inicial = $detalle->precio_inicial;
                             $coll->precio_nuevo = $detalle->precio_nuevo;
@@ -615,17 +598,17 @@ class DocumentoController extends Controller
                             $coll->presentacion = $lote->producto->medida;
                             $coll->producto = $lote->producto->id;
                             $nuevoDetalle->push($coll);
-                            //REDUCIMOS LA CANTIDAD SOLICITADA
-                            $cantidadSolicitada = $cantidadSolicitada - $lote->cantidad_logica;
                             //ACTUALIZAMOS EL LOTE
-                            $lote->cantidad_logica = 0;
+                            $lote->cantidad_logica = $lote->cantidad_logica - $cantidadSolicitada;
+                            //REDUCIMOS LA CANTIDAD SOLICITADA
+                            $cantidadSolicitada = 0;
                             $lote->update();
                         } else {
-                            if ($lote->cantidad_logica > $cantidadSolicitada) {
+                            if ($lote->cantidad_logica < $cantidadSolicitada) {
                                 //CREAMOS EL NUEVO DETALLE
                                 $coll = new Collection();
                                 $coll->producto_id = $lote->id;
-                                $coll->cantidad = $cantidadSolicitada;
+                                $coll->cantidad = $lote->cantidad_logica;
                                 $coll->precio_unitario = $detalle->precio_unitario;
                                 $coll->precio_inicial = $detalle->precio_inicial;
                                 $coll->precio_nuevo = $detalle->precio_nuevo;
@@ -638,15 +621,55 @@ class DocumentoController extends Controller
                                 $coll->presentacion = $lote->producto->medida;
                                 $coll->producto = $lote->producto->id;
                                 $nuevoDetalle->push($coll);
-                                //ACTUALIZAMOS EL LOTE
-                                $lote->cantidad_logica = $lote->cantidad_logica - $cantidadSolicitada;
                                 //REDUCIMOS LA CANTIDAD SOLICITADA
-                                $cantidadSolicitada = 0;
+                                $cantidadSolicitada = $cantidadSolicitada - $lote->cantidad_logica;
+                                //ACTUALIZAMOS EL LOTE
+                                $lote->cantidad_logica = 0;
                                 $lote->update();
+                            } else {
+                                if ($lote->cantidad_logica > $cantidadSolicitada) {
+                                    //CREAMOS EL NUEVO DETALLE
+                                    $coll = new Collection();
+                                    $coll->producto_id = $lote->id;
+                                    $coll->cantidad = $cantidadSolicitada;
+                                    $coll->precio_unitario = $detalle->precio_unitario;
+                                    $coll->precio_inicial = $detalle->precio_inicial;
+                                    $coll->precio_nuevo = $detalle->precio_nuevo;
+                                    $coll->descuento = $detalle->descuento;
+                                    $coll->dinero = $detalle->dinero;
+                                    $coll->valor_unitario = $detalle->valor_unitario;
+                                    $coll->valor_venta = $detalle->valor_venta;
+                                    $coll->unidad = $lote->producto->medidaCompleta();
+                                    $coll->descripcion_producto = $lote->producto->nombre . ' - ' . $lote->codigo_lote;
+                                    $coll->presentacion = $lote->producto->medida;
+                                    $coll->producto = $lote->producto->id;
+                                    $nuevoDetalle->push($coll);
+                                    //ACTUALIZAMOS EL LOTE
+                                    $lote->cantidad_logica = $lote->cantidad_logica - $cantidadSolicitada;
+                                    //REDUCIMOS LA CANTIDAD SOLICITADA
+                                    $cantidadSolicitada = 0;
+                                    $lote->update();
+                                }
                             }
                         }
                     }
                 }
+            } else {
+                $coll = new Collection();
+                $coll->producto_id = 0;
+                $coll->cantidad = 0;
+                $coll->precio_unitario = $detalle->precio_unitario;
+                $coll->precio_inicial = $detalle->precio_inicial;
+                $coll->precio_nuevo = $detalle->precio_nuevo;
+                $coll->descuento = $detalle->descuento;
+                $coll->dinero = $detalle->dinero;
+                $coll->valor_unitario = $detalle->valor_unitario;
+                $coll->valor_venta = $detalle->valor_venta;
+                $coll->unidad = '';
+                $coll->descripcion_producto = $detalle->producto->nombre;
+                $coll->presentacion = "";
+                $coll->producto = $detalle->producto->id;
+                $nuevoDetalle->push($coll);
             }
         }
 
@@ -826,6 +849,10 @@ class DocumentoController extends Controller
                 ]);
             }
 
+            if ($request->tipo_venta == '127' && $cliente->agente_retencion == '1' && $documento->total >= $cliente->monto_mayor) {
+                self::generarComprobanteRetencion($documento->id);
+            }
+
 
             $documento = Documento::find($documento->id);
             $documento->nombre_comprobante_archivo = $documento->serie . '-' . $documento->correlativo . '.pdf';
@@ -868,6 +895,99 @@ class DocumentoController extends Controller
                 'mensaje' => $e->getMessage(), //'Ocurrio un error porfavor volver a intentar, si el error persiste comunicarse con el administrador del sistema.'
                 'excepcion' => $e->getMessage()
             ]);
+        }
+    }
+
+    public function generarComprobanteRetencion($id)
+    {
+        $documento = Documento::findOrFail($id);
+        $impRetenido = $documento->total * ($documento->clienteEntidad->tasa_retencion / 100);
+        $impPagar = $documento->total - $impRetenido;
+        $documento->total = $impPagar;
+        $documento->update();
+        //REGISTROO COMPROBANTE RETENCION
+        $retencion = new Retencion();
+        $retencion->documento_id = $documento->id;
+        $retencion->fechaEmision = $documento->fecha_documento;
+
+        $retencion->ruc = $documento->ruc_empresa;
+        $retencion->razonSocial = $documento->empresa;
+        $retencion->nombreComercial = $documento->empresa;
+        $retencion->direccion_empresa = $documento->direccion_fiscal_empresa;
+        //UBIGEO EMPRESA
+        $ubigeo = Distrito::find($documento->empresaEntidad->ubigeo);
+        $retencion->provincia_empresa = $ubigeo ? $ubigeo->provincia : 'TRUJILLO';
+        $retencion->departamento_empresa = $ubigeo ? $ubigeo->departamento : 'LA LIBERTAD';
+        $retencion->distrito_empresa = $ubigeo ? $ubigeo->nombre : 'TRUJILLO';
+        $retencion->ubigeo_empresa = $ubigeo->id;
+
+        $retencion->tipoDoc = $documento->tipoDocumentoCliente();
+        $retencion->numDoc = $documento->documento_cliente;
+        $retencion->rznSocial = $documento->cliente;
+        //UBIGEO CLIENTE
+        $ubigeo_cliente = Distrito::find($documento->clienteEntidad->distrito_id);
+        $retencion->direccion_proveedor = $documento->direccion_cliente;
+        $retencion->provincia_proveedor = $ubigeo_cliente ? $ubigeo_cliente->provincia : 'TRUJILLO';
+        $retencion->departamento_proveedor = $ubigeo_cliente ? $ubigeo_cliente->departamento : 'LA LIBERTAD';
+        $retencion->distrito_proveedor = $ubigeo_cliente ? $ubigeo_cliente->nombre : 'TRUJILLO';
+        $retencion->ubigeo_proveedor = $ubigeo_cliente->id;
+
+        $retencion->observacion = $documento->cliente . ' - ' . $impPagar;
+        $retencion->impRetenido = $impRetenido;
+        $retencion->impPagado = $impPagar;
+        $retencion->regimen = '01';
+        $retencion->tasa = $documento->clienteEntidad->tasa_retencion;
+        $retencion->save();
+
+        $retencion_detalle = new RetencionDetalle();
+        $retencion_detalle->retencion_id = $retencion->id;
+        $retencion_detalle->documento_id = $documento->id;
+        $retencion_detalle->tipoDoc = $documento->tipoDocumento();
+        $retencion_detalle->numDoc = $documento->serie . '-' . $documento->correlativo;
+        $retencion_detalle->fechaEmision = $documento->fecha_documento;
+        $retencion_detalle->fechaRetencion = $documento->fecha_documento;
+        $retencion_detalle->moneda = $documento->simboloMoneda();
+        $retencion_detalle->impTotal = $impPagar + $impRetenido;
+        $retencion_detalle->impPagar = $impPagar;
+        $retencion_detalle->impRetenido = $impRetenido;
+        $retencion_detalle->moneda_pago = $documento->simboloMoneda();
+        $retencion_detalle->importe_pago = $impPagar + $impRetenido;
+        $retencion_detalle->fecha_pago = $documento->fecha_documento;
+        $retencion_detalle->fecha_tipo_cambio = $documento->fecha_documento;
+        $retencion_detalle->factor = 1;
+        $retencion_detalle->monedaObj = $documento->simboloMoneda();
+        $retencion_detalle->monedaRef = $documento->simboloMoneda();
+        $retencion_detalle->save();
+
+        self::obtenerCorrelativo($retencion);
+    }
+
+    public function obtenerCorrelativo($retencion)
+    {
+        if (empty($retencion->correlativo)) {
+            $serie_comprobantes = DB::table('retencions')
+            ->join('cotizacion_documento', 'cotizacion_documento.id', '=', 'retencions.documento_id')
+            ->join('empresas', 'cotizacion_documento.empresa_id', '=', 'empresas.id')
+            ->where('cotizacion_documento.empresa_id', $retencion->documento->empresa_id)
+                ->where('cotizacion_documento.tipo_venta', '127')
+                ->select('retencions.*')
+                ->orderBy('retencions.correlativo', 'DESC')
+                ->get();
+
+            if (count($serie_comprobantes) == 1) {
+                //OBTENER EL DOCUMENTO INICIADO
+                $retencion->correlativo = 1;
+                $retencion->serie = 'R001'; //$numeracion->serie;
+                $retencion->update();
+            } else {
+                //NOTA ES NUEVO EN SUNAT
+                if ($retencion->sunat != '1') {
+                    $ultimo_comprobante = $serie_comprobantes->first();
+                    $retencion->correlativo = $ultimo_comprobante->correlativo + 1;
+                    $retencion->serie = 'R001'; //$numeracion->serie;
+                    $retencion->update();
+                }
+            }
         }
     }
 
@@ -1600,8 +1720,8 @@ class DocumentoController extends Controller
 
                     "valorVenta" => (float)$documento->sub_total,
                     "totalImpuestos" => (float)$documento->total_igv,
-                    "subTotal" => (float)$documento->total,
-                    "mtoImpVenta" => (float)$documento->total,
+                    "subTotal" => (float)$documento->total + ($documento->retencion ? $documento->retencion->impRetenido : 0),
+                    "mtoImpVenta" => (float)$documento->total + ($documento->retencion ? $documento->retencion->impRetenido : 0),
                     "ublVersion" => "2.1",
                     "details" => self::obtenerProductos($documento->id),
                     "legends" =>  self::obtenerLeyenda($documento),

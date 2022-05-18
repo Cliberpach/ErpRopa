@@ -71,6 +71,23 @@
                     </div>
                 </a>
             </li>   
+
+            <li class="dropdown-divider" v-if="lstNotifyRetenciones.length > 0 && (lstNotifyRegularize.length > 0 || lstNotifyEnvio.length > 0 || lstNotifyNotas.length > 0 || lstNotifyGuias > 0)"></li>
+             <li v-if="lstNotifyRetenciones.length > 0">
+                <a href="#" class="dropdown-item"  @click="locationRetenciones()">
+                    <div  class="content-alert text-center">
+                        <b>{{ lstNotifyRetenciones.length }} {{ lstNotifyRetenciones.length > 1 ? "notificaciones" : "notificacion"}} de retenciones</b>
+                    </div>
+                </a>
+            </li>
+            <li v-for="(notify) in lstNotifyRetenciones" :key="notify.id">
+                <a href="#" class="dropdown-item" @click="locationRetenciones()">
+                    <div  class="content-alert">
+                        <i class="fa fa-envelope fa-fw text-danger"></i> Retención por enviar: {{ notify.data.body.serie + ' - ' + notify.data.body.correlativo }}
+                        <span class="float-right text-muted small">{{ notify.data.time }}</span>
+                    </div>
+                </a>
+            </li>  
             
             <li v-if="notifyCount == 0">
                 <a href="#" class="dropdown-item">
@@ -95,6 +112,7 @@ export default {
             lstNotifyRegularize: [],
             lstNotifyNotas: [],
             lstNotifyGuias: [],
+            lstNotifyRetenciones: [],
         };
     },
     mounted() {
@@ -114,6 +132,7 @@ export default {
                 this.lstNotifyRegularize = data.notifications.filter(notify => notify.data.head == 'regularize');
                 this.lstNotifyNotas = data.notifications.filter(notify => notify.data.head == 'nota');
                 this.lstNotifyGuias = data.notifications.filter(notify => notify.data.head == 'guia');
+                this.lstNotifyRetenciones = data.notifications.filter(notify => notify.data.head == 'retencion');
             })
         },
         locationEnvio: function()
@@ -131,6 +150,10 @@ export default {
         locationGuias: function()
         {
             window.location = route('consultas.ventas.alerta.guias');
+        },
+        locationRetenciones: function()
+        {
+            window.location = route('consultas.ventas.alerta.retenciones');
         },
     },
     updated() {

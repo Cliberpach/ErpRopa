@@ -41,8 +41,6 @@
                 width: '100%',
             });
 
-            $("#tipo_documento").on("change", cambiarTipoDocumento);
-
             // $("#documento").on('change', consultarDocumento);
 
             $("#departamento").on("change", cargarProvincias);
@@ -54,10 +52,7 @@
                     toastr.error('El formato del email es incorrecto','Error');
                     $(this).focus();
                 }
-            });
-
-            cambiarTipoDocumento()
-       
+            });       
 
         });
 

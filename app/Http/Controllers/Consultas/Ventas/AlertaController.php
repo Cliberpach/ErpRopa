@@ -13,6 +13,8 @@ use App\Ventas\Documento\Documento;
 use App\Ventas\Guia;
 use App\Ventas\Nota;
 use App\Ventas\NotaDetalle;
+use App\Ventas\Retencion;
+use App\Ventas\RetencionDetalle;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -259,8 +261,8 @@ class AlertaController extends Controller
 
                             "valorVenta" => (float)$documento->sub_total,
                             "totalImpuestos" => (float)$documento->total_igv,
-                            "subTotal" => (float)$documento->total,
-                            "mtoImpVenta" => (float)$documento->total,
+                            "subTotal" => (float)$documento->total + ($documento->retencion ? $documento->retencion->impRetenido : 0),
+                            "mtoImpVenta" => (float)$documento->total + ($documento->retencion ? $documento->retencion->impRetenido : 0),
                             "ublVersion" => "2.1",
                             "details" => self::obtenerProductos($documento->id),
                             "legends" =>  self::obtenerLeyenda($documento),
@@ -1077,5 +1079,308 @@ class AlertaController extends Controller
         }
 
         return $arrayProductos;
+    }
+
+    //////////////////////////////////////////////////
+    //Retenciones
+    public function retenciones()
+    {
+        $dato = "Message";
+        broadcast(new NotifySunatEvent($dato));
+        return view('consultas.ventas.alertas.retenciones');
+    }
+
+    public function getTableRetenciones()
+    {
+        $consulta =  DB::table('retencions')
+        ->join('cotizacion_documento', 'retencions.documento_id', '=', 'cotizacion_documento.id')
+        ->select(
+            'retencions.id',
+            'retencions.serie',
+            'retencions.correlativo',
+            'retencions.numdoc',
+            'retencions.rznSocial',
+            'retencions.sunat',
+            'retencions.regularize',
+            'retencions.getCdrResponse',
+            'retencions.fechaEmision',
+            DB::raw('ifnull((json_unquote(json_extract(retencions.getRegularizeResponse, "$.code"))),"-") as code_regularize'),
+            DB::raw('ifnull((json_unquote(json_extract(retencions.getCdrResponse, "$.code"))),"-") as code'),
+            DB::raw('ifnull((json_unquote(json_extract(retencions.getCdrResponse, "$.description"))),"-") as description')
+        )
+        ->where('cotizacion_documento.estado', '!=', 'ANULADO')
+        ->where('retencions.sunat', '0')
+        ->where('cotizacion_documento.sunat', '1');
+
+        if (!PuntoVenta() && !FullAccess()) {
+            $consulta = $consulta->where('user_id', Auth::user()->id);
+        }
+
+        $consulta = $consulta->orderBy('retencions.id', 'desc');
+
+        return datatables()->query(
+            $consulta
+        )->toJson();
+    }
+
+    public function sunat_retenciones($id)
+    {
+        try {
+            $documento = Retencion::findOrFail($id);
+
+            if ($documento->sunat != '1') {
+                //ARREGLO COMPROBANTE
+                $arreglo_comprobante = array(
+                    "serie" => $documento->serie,
+                    "correlativo" => $documento->correlativo,
+                    "fechaEmision" => self::obtenerFecha($documento->fechaEmision),
+                    "company" => array(
+                        "ruc" =>  $documento->ruc,
+                        "razonSocial" => $documento->razonSocial,
+                        "nombreComercial" => $documento->nombreComercial,
+                        "address" => array(
+                            "direccion" => $documento->direccion_empresa,
+                            "provincia" => $documento->provincia_empresa,
+                            "departamento" => $documento->departamento_empresa,
+                            "distrito" => $documento->distrito_empresa,
+                            "ubigeo" => $documento->ubigeo_empresa,
+                        )
+                    ),
+                    "proveedor" => array(
+                        "tipoDoc" => $documento->tipoDoc,
+                        "numDoc" => $documento->numDoc,
+                        "rznSocial" => $documento->rznSocial,
+                        "address" => array(
+                            "direccion" => $documento->direccion_proveedor,
+                            "provincia" => $documento->provincia_proveedor,
+                            "departamento" => $documento->departamento_proveedor,
+                            "distrito" => $documento->distrito_proveedor,
+                            "ubigeo" => $documento->ubigeo_proveedor,
+                        )
+                    ),
+                    "observacion" => $documento->observacion,
+                    "impRetenido" => (float)$documento->impRetenido,
+                    "impPagado" => (float)$documento->impPagado,
+                    "regimen" => "01",
+                    "tasa" => (float)$documento->tasa,
+                    "details" => self::obtenerDetallesRetencion($documento->id),
+                );
+
+                //return $arreglo_comprobante;
+                //OBTENER JSON DEL COMPROBANTE EL CUAL SE ENVIARA A SUNAT
+                $data = enviarComprobanteRetencion(json_encode($arreglo_comprobante), $documento->documento->empresa_id);
+
+                //RESPUESTA DE LA SUNAT EN JSON
+                $json_sunat = json_decode($data);
+
+                if ($json_sunat->sunatResponse->success == true) {
+
+                    if ($json_sunat->sunatResponse->cdrResponse->code == "0") {
+                        $documento->sunat = '1';
+                        $respuesta_cdr = json_encode($json_sunat->sunatResponse->cdrResponse, true);
+                        $respuesta_cdr = json_decode($respuesta_cdr, true);
+                        $documento->getCdrResponse = $respuesta_cdr;
+
+                        $data_comprobante = generarComprobanteRetencion(json_encode($arreglo_comprobante), $documento->documento->empresa_id);
+                        $name = $documento->serie . "-" . $documento->correlativo . '.pdf';
+
+                        $data_cdr = base64_decode($json_sunat->sunatResponse->cdrZip);
+                        $name_cdr = 'R-' . $documento->serie . "-" . $documento->correlativo . '.zip';
+
+                        if (!file_exists(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'sunat' . DIRECTORY_SEPARATOR . 'retencion'))) {
+                            mkdir(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'sunat' . DIRECTORY_SEPARATOR . 'retencion'));
+                        }
+
+                        if (!file_exists(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'cdr' . DIRECTORY_SEPARATOR . 'retencion'))) {
+                            mkdir(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'cdr' . DIRECTORY_SEPARATOR . 'retencion'));
+                        }
+
+                        $pathToFile = storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'sunat' . DIRECTORY_SEPARATOR . 'retencion' . DIRECTORY_SEPARATOR  . $name);
+                        $pathToFile_cdr = storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'cdr' . DIRECTORY_SEPARATOR . 'retencion' . DIRECTORY_SEPARATOR . $name_cdr);
+
+                        file_put_contents($pathToFile, $data_comprobante);
+                        file_put_contents($pathToFile_cdr, $data_cdr);
+
+                        /*$arreglo_qr = array(
+                            "ruc" => $documento->ruc_empresa,
+                            "tipo" => $documento->tipoDocumento(),
+                            "serie" => $documento->serie,
+                            "numero" => $documento->correlativo,
+                            "emision" => self::obtenerFechaEmision($documento),
+                            "igv" => 18,
+                            "total" => (float)$documento->total,
+                            "clienteTipo" => $documento->tipoDocumentoCliente(),
+                            "clienteNumero" => $documento->documento_cliente
+                        );*/
+
+                        /********************************/
+                        /*$data_qr = generarQrApi(json_encode($arreglo_qr), $documento->empresa_id);
+
+                        $name_qr = $documento->serie . "-" . $documento->correlativo . '.svg';
+
+                        if (!file_exists(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'qrs'))) {
+                            mkdir(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'qrs'));
+                        }
+
+                        $pathToFile_qr = storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'qrs' . DIRECTORY_SEPARATOR . $name_qr);
+
+                        file_put_contents($pathToFile_qr, $data_qr);*/
+
+                        /********************************/
+
+                        $data_xml = generarXmlRetencion(json_encode($arreglo_comprobante), $documento->documento->empresa_id);
+                        $name_xml = $documento->serie . '-' . $documento->correlativo . '.xml';
+                        if (!file_exists(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR . 'retencion'))) {
+                            mkdir(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR . 'retencion'));
+                        }
+                        $pathToFile_xml = storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR . 'retencion' . DIRECTORY_SEPARATOR  . $name_xml);
+                        file_put_contents($pathToFile_xml, $data_xml);
+
+                        /********************************* */
+
+                        /*$documento->nombre_comprobante_archivo = $name;
+                        $documento->hash = $json_sunat->hash;
+                        $documento->xml = $name_xml;
+                        $documento->ruta_comprobante_archivo = 'public/sunat/' . $name;
+                        $documento->ruta_qr = 'public/qrs/' . $name_qr;*/
+                        $documento->update();
+
+
+                        //Registro de actividad
+                        $descripcion = "SE AGREGÓ EL COMPROBANTE ELECTRONICO RETENCION: " . $documento->serie . "-" . $documento->correlativo;
+                        $gestion = "COMPROBANTE DE RETENCION";
+                        crearRegistro($documento, $descripcion, $gestion);
+
+                        Session::flash('success', 'Retención enviada a Sunat con exito.');
+                        Session::flash('sunat_exito', '1');
+                        Session::flash('id_sunat', $json_sunat->sunatResponse->cdrResponse->id);
+                        Session::flash('descripcion_sunat', $json_sunat->sunatResponse->cdrResponse->description);
+                        return redirect()->route('consultas.ventas.alerta.retenciones')->with('sunat_exito', 'success');
+                    } else {
+                        $documento->sunat = '0';
+                        $id_sunat = $json_sunat->sunatResponse->cdrResponse->code;
+                        $descripcion_sunat = $json_sunat->sunatResponse->cdrResponse->description;
+
+                        $respuesta_error = json_encode($json_sunat->sunatResponse->cdrResponse, true);
+                        $respuesta_error = json_decode($respuesta_error, true);
+                        $documento->getCdrResponse = $respuesta_error;
+
+                        $documento->update();
+
+                        Session::flash('error', 'Retención sin exito en el envio a sunat.');
+                        Session::flash('sunat_error', '1');
+                        Session::flash('id_sunat', $id_sunat);
+                        Session::flash('descripcion_sunat', $descripcion_sunat);
+                        return redirect()->route('consultas.ventas.alerta.retenciones')->with('sunat_error', 'error');
+                    }
+                } else {
+
+                    //COMO SUNAT NO LO ADMITE VUELVE A SER 0
+                    $documento->sunat = '0';
+                    $documento->regularize = '1';
+
+                    if ($json_sunat->sunatResponse->error) {
+                        $id_sunat = $json_sunat->sunatResponse->error->code;
+                        $descripcion_sunat = $json_sunat->sunatResponse->error->message;
+
+                        $obj_erro = new stdClass();
+                        $obj_erro->code = $json_sunat->sunatResponse->error->code;
+                        $obj_erro->description = $json_sunat->sunatResponse->error->message;
+                        $respuesta_error = json_encode($obj_erro, true);
+                        $respuesta_error = json_decode($respuesta_error, true);
+                        $documento->getRegularizeResponse = $respuesta_error;
+                    } else {
+                        $id_sunat = $json_sunat->sunatResponse->cdrResponse->id;
+                        $descripcion_sunat = $json_sunat->sunatResponse->cdrResponse->description;
+
+                        $respuesta_error = json_encode($json_sunat->sunatResponse->cdrResponse, true);
+                        $respuesta_error = json_decode($respuesta_error, true);
+                        $documento->getCdrResponse = $respuesta_error;
+                    };
+
+                    $documento->update();
+
+                    Session::flash('error', 'Retención sin exito en el envio a sunat.');
+                    Session::flash('sunat_error', '1');
+                    Session::flash('id_sunat', $id_sunat);
+                    Session::flash('descripcion_sunat', $descripcion_sunat);
+                    return redirect()->route('consultas.ventas.alerta.retenciones')->with('sunat_error', 'error');
+                }
+            } else {
+                $documento->sunat = '1';
+                $documento->update();
+
+                Session::flash('error', 'Retención fue enviado a Sunat.');
+                return redirect()->route('consultas.ventas.alerta.retenciones')->with('sunat_existe', 'error');
+            }
+        } catch (Exception $e) {
+            $documento = Retencion::findOrFail($id);
+            $documento->regularize = '1';
+            $documento->sunat = '0';
+            $obj_erro = new stdClass();
+            $obj_erro->code = 6;
+            $obj_erro->description = $e->getMessage();
+            $respuesta_error = json_encode($obj_erro, true);
+            $respuesta_error = json_decode($respuesta_error, true);
+            $documento->getRegularizeResponse = $respuesta_error;
+            $documento->update();
+
+            Session::flash('error', 'No se puede conectar con el servidor, porfavor intentar nuevamente.'); //$e->getMessage()
+            return redirect()->route('consultas.ventas.alerta.retenciones');
+        }
+    }
+
+    public function obtenerDetallesRetencion($id)
+    {
+        $detalles = RetencionDetalle::where('retencion_id', $id)->get();
+        $arrayDetalles = array();
+        foreach ($detalles as $detalle) {
+
+            $arrayDetalles[] = array(
+                "tipoDoc" => $detalle->tipoDoc,
+                "numDoc" => $detalle->numDoc,
+                "fechaEmision" => self::obtenerFecha($detalle->fechaEmision),
+                "fechaRetencion" => self::obtenerFecha($detalle->fechaRetencion),
+                "moneda" => "PEN",
+                "impTotal" => $detalle->impTotal,
+                "impPagar" => $detalle->impPagar,
+                "impRetenido" => $detalle->impRetenido,
+                "pagos" => self::obtenerPagosRetencion($id),
+                "tipoCambio" => array(
+                    "fecha" => self::obtenerFecha($detalle->fechaEmision),
+                    "factor" => 1,
+                    "monedaObj" => "PEN",
+                    "monedaRef" => "PEN"
+                )
+            );
+        }
+
+        return $arrayDetalles;
+    }
+
+    public function obtenerPagosRetencion($id)
+    {
+        $documento = Retencion::find($id);
+        $arrayPagos = array();
+        $arrayPagos[] = array(
+            "moneda" => "PEN",
+            "importe" => (float)($documento->documento->total),
+            "fecha" => self::obtenerFecha($documento->documento->fecha_vencimiento)
+
+        );
+        /*if($documento->cuenta)
+        {
+            foreach($documento->cuenta->detalles as $item)
+            {
+                $arrayPagos[] = array(
+                    "moneda" => "PEN",
+                    "monto" => (float)$item->monto,
+                    "fechaPago" => self::obtenerFechaCuenta($item->fecha)
+
+                );
+            }
+        }*/
+
+        return $arrayPagos;
     }
 }

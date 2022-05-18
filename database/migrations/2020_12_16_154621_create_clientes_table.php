@@ -59,6 +59,10 @@ class CreateClientesTable extends Migration
             //CRM
             $table->enum('crm',['0','1'])->default('0');
 
+            $table->enum('agente_retencion', ['0', '1'])->default('0');
+            $table->unsignedDecimal('tasa_retencion', 8, 2)->nullable();
+            $table->unsignedDecimal('monto_mayor', 8, 2)->nullable();
+
             $table->string('activo')->default('SIN VERIFICAR');
             $table->enum('estado',['ACTIVO','ANULADO'])->default('ACTIVO');
             $table->timestamps();

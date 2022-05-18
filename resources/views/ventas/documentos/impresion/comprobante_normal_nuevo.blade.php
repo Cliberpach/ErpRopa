@@ -348,6 +348,16 @@
                                 <td style="text-align:left; padding: 5px;"><p class="p-0 m-0">IGV {{$documento->igv}}%: S/.</p></td>
                                 <td style="text-align:right; padding: 5px;"><p class="p-0 m-0">{{ number_format($documento->total_igv, 2) }}</p></td>
                             </tr>
+                            @if (!empty($documento->retencion))
+                            <tr>
+                                <td style="text-align:left; padding: 5px;"><p class="p-0 m-0">Total S/.</p></td>
+                                <td style="text-align:right; padding: 5px;"><p class="p-0 m-0">{{ number_format($documento->total + $documento->retencion->impRetenido, 2) }}</p></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align:left; padding: 5px;"><p class="p-0 m-0">Imp. Retenido S/.</p></td>
+                                <td style="text-align:right; padding: 5px;"><p class="p-0 m-0">{{ number_format($documento->retencion->impRetenido, 2) }}</p></td>
+                            </tr>  
+                            @endif
                             <tr>
                                 <td style="text-align:left; padding: 5px;"><p class="p-0 m-0">Total a pagar: S/.</p></td>
                                 <td style="text-align:right; padding: 5px;"><p class="p-0 m-0">{{ number_format($documento->total, 2) }}</p></td>

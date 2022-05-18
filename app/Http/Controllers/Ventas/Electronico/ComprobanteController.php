@@ -196,8 +196,8 @@ class ComprobanteController extends Controller
 
                             "valorVenta" => (float)$documento->sub_total,
                             "totalImpuestos" => (float)$documento->total_igv,
-                            "subTotal" => (float)$documento->total,
-                            "mtoImpVenta" => (float)$documento->total,
+                            "subTotal" => (float)$documento->total + ($documento->retencion ? $documento->retencion->impRetenido : 0),
+                            "mtoImpVenta" => (float)$documento->total + ($documento->retencion ? $documento->retencion->impRetenido : 0),
                             "ublVersion" => "2.1",
                             "details" => self::obtenerProductos($documento->id),
                             "legends" =>  self::obtenerLeyenda($documento),

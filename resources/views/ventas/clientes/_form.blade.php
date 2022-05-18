@@ -52,6 +52,25 @@
 
                     </div>
 
+
+                    <div class="form-group">
+                        <div class="border p-4 align-items-center">
+                            <div class="form-group">
+                                <label> <input type="checkbox" id="check_retencion" class="i-checks" value="1" disabled> <b class="text-danger">¿Es agente de retención?</b> </label>
+                                <input type="hidden" name="retencion" id="retencion" class="form-control" value="0">
+                            </div>
+                            <div class="form-group row align-items-center">
+                                <label for="" class="col-12 col-md-4">Tasa (%): </label>
+                                <input type="namber" class="form-control col-12 col-md-8" name="tasa_retencion" id="tasa_retencion" value="{{ old('tasa_retencion') ? old('tasa_retencion') : (empty($cliente) ? '0.00' : $cliente->tasa_retencion) }}" readonly>
+                            </div>
+
+                            <div class="form-group row align-items-center">
+                                <label for="" class="col-12 col-md-4">Monto que sobrepase: </label>
+                                <input type="namber" class="form-control col-12 col-md-8" name="monto_mayor" id="monto_mayor" value="{{ old('monto_mayor') ? old('monto_mayor') : (empty($cliente) ? '0.00' : $cliente->monto_mayor) }}" readonly>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="form-group row">
 
                         <div class="col-lg-6 col-xs-12 select-required">
@@ -130,6 +149,9 @@
                         @endif
                     </div>
 
+                </div>
+
+                <div class="col-md-6">
                     <div class="form-group">
                         <label class="required">Dirección Fiscal</label>
                         <input type="text" id="direccion" name="direccion"
@@ -142,12 +164,6 @@
                             </span>
                         @endif
                     </div>
-
-                </div>
-
-                <div class="col-md-6">
-
-
 
                     <div class="form-group row">
                         <div class="col-lg-6 col-xs-12 select-required">
@@ -608,6 +624,7 @@
     <link href="{{ asset('Inspinia/css/plugins/daterangepicker/daterangepicker-bs3.css') }}" rel="stylesheet">
     <link href="{{ asset('Inspinia/css/plugins/select2/select2.min.css') }}" rel="stylesheet">
     <link href="{{ asset('Inspinia/css/plugins/steps/jquery.steps.css') }}" rel="stylesheet">
+    <link href="{{ asset('Inspinia/css/plugins/iCheck/custom.css' )}}" rel="stylesheet">
     <style>
         .logo {
             width: 190px;
@@ -627,6 +644,8 @@
     <script type="text/javascript"
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAS6qv64RYCHFJOygheJS7DvBDYB0iV2wI&libraries=geometry">
     </script>
+    
+    <script src="{{ asset('Inspinia/js/plugins/iCheck/icheck.min.js') }}"></script>
     <script>
         var departamento_api = '';
         var provincia_api = '';
@@ -640,19 +659,37 @@
             }
 
 
-            $('.i-checks').iCheck({
-                checkboxClass: 'icheckbox_square-green',
-                radioClass: 'iradio_square-green',
-            });
-
             $(".select2_form").select2({
                 placeholder: "SELECCIONAR",
                 allowClear: true,
                 height: '200px',
                 width: '100%',
             });
+            
+            cambiarTipoDocumento()
 
+            @if ($cliente->agente_retencion == '1')
+                $('#check_retencion').attr('checked', true);
+                $('#retencion').val('1');
+                $('.i-checks').iCheck({
+                    checkboxClass: 'icheckbox_square-green',
+                    activeClass: 'active'
+                });
 
+                $('#tasa_retencion').val('{{$cliente->tasa_retencion}}');
+                $('#monto_mayor').val('{{$cliente->monto_mayor}}');
+                $('#tasa_retencion').attr('readonly', false);
+                $('#monto_mayor').attr('readonly', false);
+            @else
+                $('#check_retencion').removeAttr('checked');
+                $('#retencion').val('0');
+                $('.i-checks').iCheck({
+                    checkboxClass: 'icheckbox_square-green',
+                });
+
+                $('#tasa_retencion').attr('readonly', true);
+                $('#monto_mayor').attr('readonly', true);
+            @endif  
 
             $("#tipo_documento").on("change", cambiarTipoDocumento);
 
@@ -723,8 +760,7 @@
                 }
 
             }
-
-
+        
         });
         function limpiar() {
             $('.logo').attr("src", "{{asset('storage/Clientes/img/default.png')}}")
@@ -774,7 +810,7 @@
                 0) {
 
                 @if (!$cliente)
-                    clearDatosPersona(true);
+                    clearDatosPersona(true);                                
                 @endif
 
                 switch (tipo_documento) {
@@ -1153,7 +1189,18 @@
 
         function cambiarTipoDocumento() {
             var tipo_documento = $("#tipo_documento").val();
+            $('#check_retencion').removeAttr('checked');    
+            $('#retencion').val('0');
+            $('.i-checks').iCheck({
+                checkboxClass: 'icheckbox_square-green',
+                activeClass: '',
+            });
 
+            $('#tasa_retencion').val('0.00');
+            $('#monto_mayor').val('0.00');
+            
+            $('#tasa_retencion').attr('readonly', true);
+            $('#monto_mayor').attr('readonly', true);   
             setLongitudDocumento();
         }
 
@@ -1263,6 +1310,37 @@
                 var provincia = objeto.value.data.ubigeo[1];
                 var distrito = objeto.value.data.ubigeo[2];
                 var estado = objeto.value.data.estado;
+                var condicion_retencion = objeto.value.data.es_agente_de_retencion;
+
+                if (condicion_retencion == 'SI') {
+                    $('#check_retencion').attr('checked', true);
+                    $('#retencion').val('1');
+                    $('.i-checks').iCheck({
+                        checkboxClass: 'icheckbox_square-green',
+                        activeClass: 'active',
+                    });
+
+                    $('#tasa_retencion').val('3.00');
+                    $('#monto_mayor').val('700.00');
+
+                    $('#tasa_retencion').removeAttr('readonly');
+                    $('#monto_mayor').removeAttr('readonly');
+                }
+                else {
+                    $('#check_retencion').removeAttr('checked');
+                    $('#retencion').val('0');
+                    $('.i-checks').iCheck({
+                        checkboxClass: 'icheckbox_square-green',
+                        activeClass: '',
+                    });
+
+                    $('#tasa_retencion').val('0.00');
+                    $('#monto_mayor').val('0.00');
+
+                    
+                    $('#tasa_retencion').attr('readonly', true);
+                    $('#monto_mayor').attr('readonly', true);
+                }
 
                 if (razonsocial != '-' && razonsocial != "NULL") {
                     $('#nombre').val(razonsocial);
@@ -1361,10 +1439,37 @@
 
         $("#documento").keyup(function() {
             $('#activo').val('SIN VERIFICAR');
+            $('#nombre').val('');
+            $('#codigo_verificacion').val('');
+            $('#check_retencion').removeAttr('checked');
+            $('#retencion').val('0');
+            $('.i-checks').iCheck({
+                checkboxClass: 'icheckbox_square-green',
+                activeClass: '',
+            });
+
+            $('#tasa_retencion').val('0.00');
+            $('#monto_mayor').val('0.00');
+            
+            $('#tasa_retencion').attr('readonly', true);
+            $('#monto_mayor').attr('readonly', true);
         })
 
         $("#nombre").keyup(function() {
             $('#activo').val('SIN VERIFICAR');
+            $('#codigo_verificacion').val('');
+            $('#check_retencion').removeAttr('checked');
+            $('#retencion').val('0');
+            $('.i-checks').iCheck({
+                checkboxClass: 'icheckbox_square-green',
+                activeClass: '',
+            });
+
+            $('#tasa_retencion').val('0.00');
+            $('#monto_mayor').val('0.00');
+            
+            $('#tasa_retencion').attr('readonly', true);
+            $('#monto_mayor').attr('readonly', true);
         })
 
         $("#tipo_documento").on('change', function(e) {
