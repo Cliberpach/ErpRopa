@@ -21,6 +21,13 @@ class CreateProductosTable extends Migration
             $table->foreign('marca_id')->references('id')->on('marcas')->onDelete('cascade');
             $table->unsignedInteger('almacen_id');
             $table->foreign('almacen_id')->references('id')->on('almacenes')->onDelete('cascade');
+            $table->unsignedInteger('color_id')->nullable();
+            $table->unsignedInteger('modelo_id')->nullable();
+            $table->unsignedInteger('tela_id')->nullable();
+            $table->unsignedInteger('talla_id')->nullable();
+            $table->unsignedInteger('sub_modelo_id')->nullable();
+            $table->unsignedInteger('temporada_id')->nullable();
+            $table->unsignedInteger('genero_id')->nullable();
             $table->string('codigo', 50)->nullable();
             $table->string('nombre');
             $table->mediumText('descripcion')->nullable();
