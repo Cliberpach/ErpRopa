@@ -3,6 +3,7 @@
 use App\Almacenes\LoteProducto;
 use App\Almacenes\Producto;
 use App\Almacenes\TipoCliente;
+use App\Color;
 use App\Compras\CuentaProveedor;
 use App\Mantenimiento\Tabla\General;
 use App\Mantenimiento\Ubigeo\Departamento;
@@ -179,7 +180,7 @@ if (!function_exists('tipos_venta')) {
 if (!function_exists('cod_motivos')) {
     function cod_motivos()
     {
-        return TablaDetalle::where('tabla_id',33)->wherein('simbolo',['01','07'])->get();
+        return TablaDetalle::where('tabla_id', 33)->wherein('simbolo', ['01', '07'])->get();
     }
 }
 
@@ -219,29 +220,23 @@ if (!function_exists('docValido')) {
     {
         $documento = DocumentoDocumento::find($id);
         $detalles = DocumentoDetalle::where('documento_id', $id)->get();
-        $cont = 0 ;
+        $cont = 0;
 
-        if($documento->sunat == '2')
-        {
+        if ($documento->sunat == '2') {
             return false;
         }
 
-        foreach($detalles as $detalle)
-        {
-            if($detalle->cantidad == $detalle->detalles->sum('cantidad'))
-            {
+        foreach ($detalles as $detalle) {
+            if ($detalle->cantidad == $detalle->detalles->sum('cantidad')) {
                 $cont = $cont + 1;
             }
         }
 
-        if(count($detalles) == $cont)
-        {
+        if (count($detalles) == $cont) {
             $documento->sunat = '2';
             $documento->update();
             return false;
-        }
-        else
-        {
+        } else {
             return true;
         }
     }
@@ -257,7 +252,7 @@ if (!function_exists('docCompraValido')) {
 
         foreach ($detalles as $detalle) {
             $cant_nota_electronica = 0;
-            foreach($detalle->loteProducto->detalles_venta as $item) {
+            foreach ($detalle->loteProducto->detalles_venta as $item) {
                 $cant_nota_electronica = $cant_nota_electronica + $item->detalles->sum("cantidad");
             }
             $cantidad = $detalle->loteProducto->cantidad_inicial + $cant_nota_electronica - $detalle->loteProducto->detalles_venta->sum("cantidad") - $detalle->loteProducto->detalles_salida->sum("cantidad") - $detalle->detalles->sum('cantidad');
@@ -729,7 +724,7 @@ if (!function_exists('agregarEmpresaapi')) {
     function agregarEmpresaapi($empresa)
     {
         $url = "https://facturacion.apisperu.com/api/v1/companies";
-        $client = new \GuzzleHttp\Client(['verify'=>false]);
+        $client = new \GuzzleHttp\Client(['verify' => false]);
         $token = obtenerTokenapi();
         $response = $client->post($url, [
             'headers' => [
@@ -755,7 +750,7 @@ if (!function_exists('borrarEmpresaapi')) {
     function borrarEmpresaapi($id)
     {
         $url = "https://facturacion.apisperu.com/api/v1/companies/{$id}";
-        $client = new \GuzzleHttp\Client(['verify'=>false]);
+        $client = new \GuzzleHttp\Client(['verify' => false]);
         $token = obtenerTokenapi();
         $response = $client->delete($url, [
             'headers' => [
@@ -773,7 +768,7 @@ if (!function_exists('modificarEmpresaapi')) {
     function modificarEmpresaapi($empresa, $id)
     {
         $url = "https://facturacion.apisperu.com/api/v1/companies/{$id}";
-        $client = new \GuzzleHttp\Client(['verify'=>false]);
+        $client = new \GuzzleHttp\Client(['verify' => false]);
         $token = obtenerTokenapi();
         $response = $client->put($url, [
             'headers' => [
@@ -811,7 +806,7 @@ if (!function_exists('generarComprobanteapi')) {
     function generarComprobanteapi($comprobante, $empresa)
     {
         $url = "https://facturacion.apisperu.com/api/v1/invoice/pdf";
-        $client = new \GuzzleHttp\Client(['verify'=>false]);
+        $client = new \GuzzleHttp\Client(['verify' => false]);
         $token = tokenEmpresa($empresa);
         $response = $client->post($url, [
             'headers' => [
@@ -840,7 +835,7 @@ if (!function_exists('generarXmlapi')) {
     function generarXmlapi($comprobante, $empresa)
     {
         $url = "https://facturacion.apisperu.com/api/v1/invoice/xml";
-        $client = new \GuzzleHttp\Client(['verify'=>false]);
+        $client = new \GuzzleHttp\Client(['verify' => false]);
         $token = tokenEmpresa($empresa);
         $response = $client->post($url, [
             'headers' => [
@@ -872,7 +867,7 @@ if (!function_exists('generarQrApi')) {
     function generarQrApi($comprobante, $empresa)
     {
         $url = "https://facturacion.apisperu.com/api/v1/sale/qr";
-        $client = new \GuzzleHttp\Client(['verify'=>false]);
+        $client = new \GuzzleHttp\Client(['verify' => false]);
         $token = tokenEmpresa($empresa);
         $response = $client->post($url, [
             'headers' => [
@@ -902,7 +897,7 @@ if (!function_exists('enviarComprobanteapi')) {
     function enviarComprobanteapi($comprobante, $empresa)
     {
         $url = "https://facturacion.apisperu.com/api/v1/invoice/send";
-        $client = new \GuzzleHttp\Client(['verify'=>false]);
+        $client = new \GuzzleHttp\Client(['verify' => false]);
         $token = tokenEmpresa($empresa);
         $response = $client->post($url, [
             'headers' => [
@@ -1020,7 +1015,7 @@ if (!function_exists('pdfGuiaapi')) {
     function pdfGuiaapi($guia)
     {
         $url = "https://facturacion.apisperu.com/api/v1/despatch/pdf";
-        $client = new \GuzzleHttp\Client(['verify'=>false]);
+        $client = new \GuzzleHttp\Client(['verify' => false]);
         $token = obtenerTokenapi();
         $response = $client->post($url, [
             'headers' => [
@@ -1050,7 +1045,7 @@ if (!function_exists('enviarGuiaapi')) {
     function enviarGuiaapi($guia)
     {
         $url = "https://facturacion.apisperu.com/api/v1/despatch/send";
-        $client = new \GuzzleHttp\Client(['verify'=>false]);
+        $client = new \GuzzleHttp\Client(['verify' => false]);
         $token = obtenerTokenapi();
         $response = $client->post($url, [
             'headers' => [
@@ -1078,7 +1073,7 @@ if (!function_exists('pdfNotaapi')) {
     function pdfNotaapi($nota)
     {
         $url = "https://facturacion.apisperu.com/api/v1/note/pdf";
-        $client = new \GuzzleHttp\Client(['verify'=>false]);
+        $client = new \GuzzleHttp\Client(['verify' => false]);
         $token = obtenerTokenapi();
         $response = $client->post($url, [
             'headers' => [
@@ -1104,7 +1099,7 @@ if (!function_exists('enviarNotaapi')) {
     function enviarNotaapi($nota)
     {
         $url = "https://facturacion.apisperu.com/api/v1/note/send";
-        $client = new \GuzzleHttp\Client(['verify'=>false]);
+        $client = new \GuzzleHttp\Client(['verify' => false]);
         $token = obtenerTokenapi();
         $response = $client->post($url, [
             'headers' => [
@@ -1138,9 +1133,8 @@ if (!function_exists('actualizarStockProductos')) {
     function actualizarStockProductos()
     {
         $productos = Producto::all();
-        foreach($productos as $producto)
-        {
-            $cantidadProductos = LoteProducto::where('producto_id',$producto->id)->where('estado','1')->sum('cantidad');
+        foreach ($productos as $producto) {
+            $cantidadProductos = LoteProducto::where('producto_id', $producto->id)->where('estado', '1')->sum('cantidad');
             //ACTUALIZAR EL STOCK DEL PRODUCTO
             $producto->stock = $cantidadProductos ? $cantidadProductos : 0.00;
             $producto->update();
@@ -1152,10 +1146,9 @@ if (!function_exists('actualizarPorcentajes')) {
     function actualizarPorcentajes()
     {
         $productos = Producto::all();
-        foreach($productos as $producto)
-        {
-            $tipo_normal = TipoCliente::where('producto_id',$producto->id)->where('estado','ACTIVO')->where('cliente','121')->first();
-            $tipo_distribuidor = TipoCliente::where('producto_id',$producto->id)->where('estado','ACTIVO')->where('cliente','122')->first();
+        foreach ($productos as $producto) {
+            $tipo_normal = TipoCliente::where('producto_id', $producto->id)->where('estado', 'ACTIVO')->where('cliente', '121')->first();
+            $tipo_distribuidor = TipoCliente::where('producto_id', $producto->id)->where('estado', 'ACTIVO')->where('cliente', '122')->first();
 
             $producto->porcentaje_normal = $tipo_normal ? $tipo_normal->porcentaje : 0;
             $producto->porcentaje_distribuidor = $tipo_distribuidor ? $tipo_distribuidor->porcentaje : 0;
@@ -1167,11 +1160,9 @@ if (!function_exists('actualizarPorcentajes')) {
 if (!function_exists('actualizarStockProductosxCompras')) {
     function actualizarStockProductosxCompras()
     {
-        $compras = Documento::where('estado','ANULADO')->get();
-        foreach($compras as $compra)
-        {
-            foreach($compra->detalles as $item)
-            {
+        $compras = Documento::where('estado', 'ANULADO')->get();
+        foreach ($compras as $compra) {
+            foreach ($compra->detalles as $item) {
                 $item->estado = 'ANULADO';
                 $item->update();
             }
@@ -1226,14 +1217,14 @@ if (!function_exists('cuentas')) {
 if (!function_exists('proveedores')) {
     function proveedores()
     {
-        return Proveedor::where('estado','!=','ANULADO')->get();
+        return Proveedor::where('estado', '!=', 'ANULADO')->get();
     }
 }
 
 if (!function_exists('clientes')) {
     function clientes()
     {
-        return Cliente::where('estado','!=','ANULADO')->get();
+        return Cliente::where('estado', '!=', 'ANULADO')->get();
     }
 }
 if (!function_exists('movimientoUser')) {
@@ -1267,15 +1258,13 @@ if (!function_exists('cuadreMovimientoCajaIngresosCuadreEfectivo')) {
             if ($item->documento->condicion_id == 1 && ifNoConvertido($item->documento->id) && $item->documento->estado_pago == 'PAGADA') { // && $item->documento->sunat != '2'
                 if ($item->documento->tipo_pago_id == 1) {
                     $totalIngresos = $totalIngresos + $item->documento->importe;
-                }
-                else{
+                } else {
                     $totalIngresos = $totalIngresos + $item->documento->efectivo;
                 }
             }
         }
         foreach ($movimiento->detalleCuentaCliente as $item) {
-            if($item->tipo_pago_id == 1)
-            {
+            if ($item->tipo_pago_id == 1) {
                 $totalIngresos = $totalIngresos  + $item->efectivo;
             }
         }
@@ -1289,8 +1278,7 @@ if (!function_exists('cuadreMovimientoCajaEgresosCuadreEfectivo')) {
     {
         $totalEgresos = 0;
         foreach ($movimiento->detalleCuentaProveedor as $key => $item) {
-            if($item->tipo_pago_id == 1)
-            {
+            if ($item->tipo_pago_id == 1) {
                 $totalEgresos = $totalEgresos + $item->efectivo;
             }
         }
@@ -1323,10 +1311,8 @@ if (!function_exists('cuadreMovimientoCajaIngresosVentaElectronico')) {
     function cuadreMovimientoCajaIngresosVentaElectronico(MovimientoCaja $movimiento)
     {
         $totalIngresos = 0;
-        foreach(tipos_pago() as $tipo)
-        {
-            if($tipo->id > 1)
-            {
+        foreach (tipos_pago() as $tipo) {
+            if ($tipo->id > 1) {
                 $totalIngresos = $totalIngresos + (cuadreMovimientoCajaIngresosVentaResum($movimiento, $tipo->id) - cuadreMovimientoDevolucionesResum($movimiento, $tipo->id));
             }
         }
@@ -1335,25 +1321,21 @@ if (!function_exists('cuadreMovimientoCajaIngresosVentaElectronico')) {
 }
 
 if (!function_exists('cuadreMovimientoCajaIngresosVentaResum')) {
-    function cuadreMovimientoCajaIngresosVentaResum(MovimientoCaja $movimiento,$id)
+    function cuadreMovimientoCajaIngresosVentaResum(MovimientoCaja $movimiento, $id)
     {
-       if($id == 1)
-       {
+        if ($id == 1) {
             $totalIngresos = 0;
             foreach ($movimiento->detalleMovimientoVentas as $item) {
                 if ($item->documento->condicion_id == 1 && ifNoConvertido($item->documento->id) && $item->documento->estado_pago == 'PAGADA') { // && $item->documento->sunat != '2'
                     if ($item->documento->tipo_pago_id == $id) {
                         $totalIngresos = $totalIngresos + $item->documento->importe;
-                    }
-                    else{
+                    } else {
                         $totalIngresos = $totalIngresos + $item->documento->efectivo;
                     }
                 }
             }
             return $totalIngresos;
-       }
-       else
-       {
+        } else {
             $totalIngresos = 0;
             foreach ($movimiento->detalleMovimientoVentas as $item) {
                 if ($item->documento->condicion_id == 1  && ifNoConvertido($item->documento->id) && $item->documento->estado_pago == 'PAGADA') { // && $item->documento->sunat != '2'
@@ -1363,7 +1345,7 @@ if (!function_exists('cuadreMovimientoCajaIngresosVentaResum')) {
                 }
             }
             return $totalIngresos;
-       }
+        }
     }
 }
 
@@ -1375,14 +1357,14 @@ if (!function_exists('cuadreMovimientoDevoluciones')) {
     function cuadreMovimientoDevoluciones(MovimientoCaja $movimiento)
     {
         $cuenta = TablaDetalle::find(165);
-        $cuenta_id = $cuenta->descripcion == 'DEVOLUCION' ? $cuenta->id : (TablaDetalle::where('descripcion','DEVOLUCION')->where('tabla_id',32)->first() ? TablaDetalle::where('descripcion','DEVOLUCION')->where('tabla_id',32)->first()->id : null);
+        $cuenta_id = $cuenta->descripcion == 'DEVOLUCION' ? $cuenta->id : (TablaDetalle::where('descripcion', 'DEVOLUCION')->where('tabla_id', 32)->first() ? TablaDetalle::where('descripcion', 'DEVOLUCION')->where('tabla_id', 32)->first()->id : null);
         $totalEgresos = 0;
         foreach ($movimiento->detalleMoviemientoEgresos as $key => $item) {
             if ($item->egreso->estado == "ACTIVO" && $item->egreso->cuenta_id == $cuenta_id) {
                 $totalEgresos = $totalEgresos + ($item->egreso->efectivo + $item->egreso->importe);
             }
         }
-            return $totalEgresos;
+        return $totalEgresos;
         return $totalEgresos;
     }
 }
@@ -1391,9 +1373,8 @@ if (!function_exists('cuadreMovimientoDevolucionesResum')) {
     function cuadreMovimientoDevolucionesResum(MovimientoCaja $movimiento, $id)
     {
         $cuenta = TablaDetalle::find(165);
-        $cuenta_id = $cuenta->descripcion == 'DEVOLUCION' ? $cuenta->id : (TablaDetalle::where('descripcion','DEVOLUCION')->where('tabla_id',32)->first() ? TablaDetalle::where('descripcion','DEVOLUCION')->where('tabla_id',32)->first()->id : null);
-        if($id == 1)
-        {
+        $cuenta_id = $cuenta->descripcion == 'DEVOLUCION' ? $cuenta->id : (TablaDetalle::where('descripcion', 'DEVOLUCION')->where('tabla_id', 32)->first() ? TablaDetalle::where('descripcion', 'DEVOLUCION')->where('tabla_id', 32)->first()->id : null);
+        if ($id == 1) {
             $totalEgresos = 0;
             foreach ($movimiento->detalleMoviemientoEgresos as $key => $item) {
                 if ($item->egreso->estado == "ACTIVO" && $item->egreso->cuenta_id == $cuenta_id) {
@@ -1401,14 +1382,11 @@ if (!function_exists('cuadreMovimientoDevolucionesResum')) {
                 }
             }
             return $totalEgresos;
-        }
-        else
-        {
+        } else {
             $totalEgresos = 0;
             foreach ($movimiento->detalleMoviemientoEgresos as $key => $item) {
                 if ($item->egreso->estado == "ACTIVO" && $item->egreso->cuenta_id == $cuenta_id) {
-                    if($item->egreso->tipo_pago_id == $id)
-                    {
+                    if ($item->egreso->tipo_pago_id == $id) {
                         $totalEgresos = $totalEgresos + $item->egreso->importe;
                     }
                 }
@@ -1434,21 +1412,18 @@ if (!function_exists('cuadreMovimientoCajaIngresosCobranza')) {
 if (!function_exists('cuadreMovimientoCajaIngresosCobranzaResum')) {
     function cuadreMovimientoCajaIngresosCobranzaResum(MovimientoCaja $movimiento, $id)
     {
-        if($id == 1)
-        {
+        if ($id == 1) {
             $totalIngresos = 0;
 
             foreach ($movimiento->detalleCuentaCliente as $item) {
                 $totalIngresos = $totalIngresos  + $item->efectivo;
             }
             return $totalIngresos;
-        }
-        else{
+        } else {
             $totalIngresos = 0;
 
             foreach ($movimiento->detalleCuentaCliente as $item) {
-                if($item->tipo_pago_id == $id)
-                {
+                if ($item->tipo_pago_id == $id) {
                     $totalIngresos = $totalIngresos  + $item->importe;
                 }
             }
@@ -1476,19 +1451,15 @@ if (!function_exists('cuadreMovimientoCajaEgresosEgreso')) {
 if (!function_exists('cuadreMovimientoCajaEgresosEgresoResum')) {
     function cuadreMovimientoCajaEgresosEgresoResum($movimiento, $id)
     {
-        if($id == 1)
-        {
+        if ($id == 1) {
             $totalEgresos = 0;
             foreach ($movimiento->detalleMoviemientoEgresos as $key => $item) {
-                if($item->egreso->estado == 'ACTIVO')
-                {
+                if ($item->egreso->estado == 'ACTIVO') {
                     $totalEgresos = $totalEgresos + $item->egreso->efectivo;
                 }
             }
             return $totalEgresos;
-        }
-        else
-        {
+        } else {
             $totalEgresos = 0;
             foreach ($movimiento->detalleMoviemientoEgresos as $key => $item) {
                 if ($item->egreso->estado == "ACTIVO" && $item->egreso->tipo_pago_id == $id) {
@@ -1515,20 +1486,16 @@ if (!function_exists('cuadreMovimientoCajaEgresosPago')) {
 if (!function_exists('cuadreMovimientoCajaEgresosPagoResum')) {
     function cuadreMovimientoCajaEgresosPagoResum($movimiento, $id)
     {
-        if($id == 1)
-        {
+        if ($id == 1) {
             $totalEgresos = 0;
             foreach ($movimiento->detalleCuentaProveedor as $key => $item) {
                 $totalEgresos = $totalEgresos + $item->efectivo;
             }
             return $totalEgresos;
-        }
-        else
-        {
+        } else {
             $totalEgresos = 0;
             foreach ($movimiento->detalleCuentaProveedor as $key => $item) {
-                if($item->tipo_pago_id == $id)
-                {
+                if ($item->tipo_pago_id == $id) {
                     $totalEgresos = $totalEgresos + $item->importe;
                 }
             }
@@ -1542,11 +1509,10 @@ if (!function_exists('cuadreMovimientoCajaEgresosPagoResum')) {
 if (!function_exists('comprobantes_empresa')) {
     function comprobantes_empresa()
     {
-        $comprobantes = Numeracion::where('empresa_id',Empresa::first()->id)->where('estado','ACTIVO')->get();
-        foreach($comprobantes as $arr)
-    {
-        $arr['descripcion'] = $arr->comprobanteDescripcion();
-    }
+        $comprobantes = Numeracion::where('empresa_id', Empresa::first()->id)->where('estado', 'ACTIVO')->get();
+        foreach ($comprobantes as $arr) {
+            $arr['descripcion'] = $arr->comprobanteDescripcion();
+        }
         return $comprobantes;
     }
 }
@@ -1555,13 +1521,14 @@ if (!function_exists('precio_dolar')) {
     function precio_dolar()
     {
         $fecha =  Carbon::now()->toDateString();
-        $ctx = stream_context_create(array('http'=>
+        $ctx = stream_context_create(array(
+            'http' =>
             array(
                 'timeout' => 1200,  //1200 Seconds is 20 Minutes
             )
         ));
-        $data = file_get_contents("https://api.apis.net.pe/v1/tipo-cambio-sunat?fecha=".$fecha,false,$ctx);
-        $infodata = json_decode($data,false);
+        $data = file_get_contents("https://api.apis.net.pe/v1/tipo-cambio-sunat?fecha=" . $fecha, false, $ctx);
+        $infodata = json_decode($data, false);
         return response()->json($infodata);
     }
 }
@@ -1579,20 +1546,20 @@ if (!function_exists('ventas_mensual')) {
     function ventas_mensual()
     {
         $fecha_hoy = Carbon::now();
-        $mes = date_format($fecha_hoy,'m');
-        $anio = date_format($fecha_hoy,'Y');
-        $total = DocumentoDocumento::where('estado','!=','ANULADO')->whereMonth('fecha_documento',$mes)->whereYear('fecha_documento',$anio)->sum('total');
-        $total_invalida = DocumentoDocumento::where('estado', '!=', 'ANULADO')->whereMonth('fecha_documento', $mes)->whereYear('fecha_documento', $anio)->where('convertir', '!=', '')->where('tipo_venta','!=','129')->sum('total');
-        $total_notas = Nota::whereMonth('fechaEmision',$mes)->whereYear('fechaEmision',$anio)->sum('mtoImpVenta');
+        $mes = date_format($fecha_hoy, 'm');
+        $anio = date_format($fecha_hoy, 'Y');
+        $total = DocumentoDocumento::where('estado', '!=', 'ANULADO')->whereMonth('fecha_documento', $mes)->whereYear('fecha_documento', $anio)->sum('total');
+        $total_invalida = DocumentoDocumento::where('estado', '!=', 'ANULADO')->whereMonth('fecha_documento', $mes)->whereYear('fecha_documento', $anio)->where('convertir', '!=', '')->where('tipo_venta', '!=', '129')->sum('total');
+        $total_notas = Nota::whereMonth('fechaEmision', $mes)->whereYear('fechaEmision', $anio)->sum('mtoImpVenta');
         return (float)($total - $total_invalida - $total_notas);
     }
 }
 
 if (!function_exists('ventas_mensual_random')) {
-    function ventas_mensual_random($mes,$anio)
+    function ventas_mensual_random($mes, $anio)
     {
-        $total = DocumentoDocumento::where('estado','!=','ANULADO')->whereMonth('fecha_documento',$mes)->whereYear('fecha_documento',$anio)->sum('total');
-        $total_invalida = DocumentoDocumento::where('estado','!=','ANULADO')->whereMonth('fecha_documento',$mes)->whereYear('fecha_documento',$anio)->where('convertir','!=','')->where('tipo_venta','!=','129')->sum('total');
+        $total = DocumentoDocumento::where('estado', '!=', 'ANULADO')->whereMonth('fecha_documento', $mes)->whereYear('fecha_documento', $anio)->sum('total');
+        $total_invalida = DocumentoDocumento::where('estado', '!=', 'ANULADO')->whereMonth('fecha_documento', $mes)->whereYear('fecha_documento', $anio)->where('convertir', '!=', '')->where('tipo_venta', '!=', '129')->sum('total');
         $total_notas = Nota::whereMonth('fechaEmision', $mes)->whereYear('fechaEmision', $anio)->sum('mtoImpVenta');
         return (float)($total - $total_invalida - $total_notas);
     }
@@ -1602,13 +1569,12 @@ if (!function_exists('utilidad_mensual')) {
     function utilidad_mensual()
     {
         $fecha_hoy = Carbon::now();
-        $mes = date_format($fecha_hoy,'m');
-        $anio = date_format($fecha_hoy,'Y');
-        $ventas = DocumentoDocumento::where('estado','!=','ANULADO')->whereMonth('fecha_documento',$mes)->whereYear('fecha_documento',$anio)->get();
+        $mes = date_format($fecha_hoy, 'm');
+        $anio = date_format($fecha_hoy, 'Y');
+        $ventas = DocumentoDocumento::where('estado', '!=', 'ANULADO')->whereMonth('fecha_documento', $mes)->whereYear('fecha_documento', $anio)->get();
         $coleccion = collect();
         foreach ($ventas as $venta) {
-            if(ifNoConvertido($venta->id))
-            {
+            if (ifNoConvertido($venta->id)) {
                 $detalles = DocumentoDetalle::where('estado', 'ACTIVO')->where('documento_id', $venta->id)->get();
                 foreach ($detalles as $detalle) {
                     $precom = $detalle->lote->detalle_compra ? ($detalle->lote->detalle_compra->precio_soles + ($detalle->lote->detalle_compra->costo_flete_soles / $detalle->lote->detalle_compra->cantidad)) : $detalle->lote->detalle_nota->costo_soles;
@@ -1631,7 +1597,7 @@ if (!function_exists('utilidad_mensual')) {
 }
 
 if (!function_exists('utilidad_mensual_random')) {
-    function utilidad_mensual_random($mes,$anio)
+    function utilidad_mensual_random($mes, $anio)
     {
         $ventas = DocumentoDocumento::where('estado', '!=', 'ANULADO')->whereMonth('fecha_documento', $mes)->whereYear('fecha_documento', $anio)->get();
         $coleccion = collect();
@@ -1664,9 +1630,9 @@ if (!function_exists('inversion_mensual')) {
     function inversion_mensual()
     {
         $fecha_hoy = Carbon::now();
-        $mes = date_format($fecha_hoy,'m');
-        $anio = date_format($fecha_hoy,'Y');
-        $total = Documento::where('estado','!=','ANULADO')->whereMonth('fecha_emision',$mes)->whereYear('fecha_emision',$anio)->sum('total_soles');
+        $mes = date_format($fecha_hoy, 'm');
+        $anio = date_format($fecha_hoy, 'Y');
+        $total = Documento::where('estado', '!=', 'ANULADO')->whereMonth('fecha_emision', $mes)->whereYear('fecha_emision', $anio)->sum('total_soles');
         return $total;
     }
 }
@@ -1686,9 +1652,9 @@ if (!function_exists('cuentas_pagar')) {
     function cuentas_pagar()
     {
         $fecha_hoy = Carbon::now();
-        $mes = date_format($fecha_hoy,'m');
-        $anio = date_format($fecha_hoy,'Y');
-        $total = CuentaProveedor::where('estado','!=','ANULADO')->whereMonth('created_at',$mes)->whereYear('created_at',$anio)->sum('saldo');
+        $mes = date_format($fecha_hoy, 'm');
+        $anio = date_format($fecha_hoy, 'Y');
+        $total = CuentaProveedor::where('estado', '!=', 'ANULADO')->whereMonth('created_at', $mes)->whereYear('created_at', $anio)->sum('saldo');
         return $total;
     }
 }
@@ -1697,9 +1663,9 @@ if (!function_exists('cuentas_cobrar')) {
     function cuentas_cobrar()
     {
         $fecha_hoy = Carbon::now();
-        $mes = date_format($fecha_hoy,'m');
-        $anio = date_format($fecha_hoy,'Y');
-        $total = CuentaCliente::where('estado','!=','ANULADO')->whereMonth('created_at',$mes)->whereYear('created_at',$anio)->sum('saldo');
+        $mes = date_format($fecha_hoy, 'm');
+        $anio = date_format($fecha_hoy, 'Y');
+        $total = CuentaCliente::where('estado', '!=', 'ANULADO')->whereMonth('created_at', $mes)->whereYear('created_at', $anio)->sum('saldo');
         return $total;
     }
 }
@@ -1709,8 +1675,8 @@ if (!function_exists('generarCodigo')) {
     {
         $key = '';
         $pattern = '1234567890abcdefghijklmnopqrstuvwxyz0987654321ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        $max = strlen($pattern)-1;
-        for($i=0;$i < $longitud;$i++) $key .= $pattern[mt_rand(0,$max)];
+        $max = strlen($pattern) - 1;
+        for ($i = 0; $i < $longitud; $i++) $key .= $pattern[mt_rand(0, $max)];
         return $key;
     }
 }
@@ -1728,13 +1694,10 @@ if (!function_exists('FullAccess')) {
     {
         $user = Auth::user();
         $fullaccess = false;
-        if(count($user->roles)>0)
-        {
+        if (count($user->roles) > 0) {
             $cont = 0;
-            while($cont < count($user->roles))
-            {
-                if($user->roles[$cont]['full-access'] == 'SI')
-                {
+            while ($cont < count($user->roles)) {
+                if ($user->roles[$cont]['full-access'] == 'SI') {
                     $fullaccess = true;
                     $cont = count($user->roles);
                 }
@@ -1751,13 +1714,10 @@ if (!function_exists('PuntoVenta')) {
     {
         $user = Auth::user();
         $fullaccess = false;
-        if(count($user->roles)>0)
-        {
+        if (count($user->roles) > 0) {
             $cont = 0;
-            while($cont < count($user->roles))
-            {
-                if($user->roles[$cont]['punto-venta'] == 'SI')
-                {
+            while ($cont < count($user->roles)) {
+                if ($user->roles[$cont]['punto-venta'] == 'SI') {
                     $fullaccess = true;
                     $cont = count($user->roles);
                 }
@@ -1772,7 +1732,7 @@ if (!function_exists('PuntoVenta')) {
 if (!function_exists('tipos_pago')) {
     function tipos_pago()
     {
-        $tipos = TipoPago::where('estado','ACTIVO')->get();
+        $tipos = TipoPago::where('estado', 'ACTIVO')->get();
         return $tipos;
     }
 }
@@ -1781,16 +1741,12 @@ if (!function_exists('ifNoConvertido')) {
     function ifNoConvertido($id)
     {
         $doc = DocumentoDocumento::find($id);
-        if($doc->tipo_venta == '129')
-        {
+        if ($doc->tipo_venta == '129') {
             return true;
-        }
-        else
-        {
-            if($doc->convertir)
-            {
+        } else {
+            if ($doc->convertir) {
                 return false;
-            }else{
+            } else {
                 return true;
             }
         }
@@ -1800,10 +1756,9 @@ if (!function_exists('ifNoConvertido')) {
 if (!function_exists('addComprasLote')) {
     function addComprasLote()
     {
-        $detalles = Detalle_Documento::where('estado','ACTIVO')->get();
+        $detalles = Detalle_Documento::where('estado', 'ACTIVO')->get();
 
-        foreach($detalles as $detalle)
-        {
+        foreach ($detalles as $detalle) {
             $lote = new LoteProducto();
             $lote->compra_documento_id = $detalle->documento->id;
             $lote->codigo_lote = $detalle->lote;
@@ -1827,7 +1782,7 @@ if (!function_exists('addComprasLote')) {
             $movimiento->almacen_final_id = $detalle->producto->almacen->id;
             $movimiento->cantidad = $detalle->cantidad;
             $movimiento->nota = 'COMPRA';
-            $movimiento->observacion = $producto->codigo.' - '.$producto->descripcion;
+            $movimiento->observacion = $producto->codigo . ' - ' . $producto->descripcion;
             $movimiento->usuario_id = auth()->user()->id;
             $movimiento->movimiento = 'INGRESO';
             $movimiento->producto_id = $detalle->producto_id;
@@ -1841,32 +1796,34 @@ if (!function_exists('addComprasLote')) {
 }
 
 if (!function_exists('timeago')) {
-    function timeago($date) {
+    function timeago($date)
+    {
         $timestamp = strtotime($date);
 
         $strTime = array("segundo", "minuto", "hora", "dia", "mes", "año");
-        $length = array("60","60","24","30","12","10");
+        $length = array("60", "60", "24", "30", "12", "10");
 
         $currentTime = time();
-        if($currentTime >= $timestamp) {
-                    $diff     = time()- $timestamp;
-                    for($i = 0; $diff >= $length[$i] && $i < count($length)-1; $i++) {
-                    $diff = $diff / $length[$i];
-                    }
+        if ($currentTime >= $timestamp) {
+            $diff     = time() - $timestamp;
+            for ($i = 0; $diff >= $length[$i] && $i < count($length) - 1; $i++) {
+                $diff = $diff / $length[$i];
+            }
 
-                    $diff = round($diff);
-                    return "Hace " . $diff . " " . $strTime[$i] . "(s)";
+            $diff = round($diff);
+            return "Hace " . $diff . " " . $strTime[$i] . "(s)";
         }
     }
 }
 
 if (!function_exists('obtenerLegend')) {
-    function obtenerLegend($documento) {
+    function obtenerLegend($documento)
+    {
         $formatter = new NumeroALetras();
         $convertir = $formatter->toInvoice($documento->total, 2, 'SOLES');
 
         //CREAR LEYENDA DEL COMPROBANTE
-        $arrayLeyenda = Array();
+        $arrayLeyenda = array();
         $arrayLeyenda[] = array(
             "code" => "1000",
             "value" => $convertir
@@ -1876,71 +1833,67 @@ if (!function_exists('obtenerLegend')) {
 }
 
 if (!function_exists('refreshNotifications')) {
-    function refreshNotifications() {
+    function refreshNotifications()
+    {
         $delete = DB::table('notifications');
 
-        if(!PuntoVenta() && !FullAccess())
-        {
-            $delete = $delete->where('notifiable_id',Auth::user()->id);
+        if (!PuntoVenta() && !FullAccess()) {
+            $delete = $delete->where('notifiable_id', Auth::user()->id);
         }
 
         $delete = $delete->delete();
 
         $documentos =  DB::table('cotizacion_documento')
-        ->select(
-            'cotizacion_documento.*',
-        )
-        ->whereIn('cotizacion_documento.tipo_venta',['127','128'])
-        ->where('cotizacion_documento.estado', '!=','ANULADO')
-        ->where('cotizacion_documento.sunat','0')
-        ->where('cotizacion_documento.contingencia','0')
-        ->whereRaw('ifnull((json_unquote(json_extract(cotizacion_documento.getRegularizeResponse, "$.code"))),"0000") != "1033"');
+            ->select(
+                'cotizacion_documento.*',
+            )
+            ->whereIn('cotizacion_documento.tipo_venta', ['127', '128'])
+            ->where('cotizacion_documento.estado', '!=', 'ANULADO')
+            ->where('cotizacion_documento.sunat', '0')
+            ->where('cotizacion_documento.contingencia', '0')
+            ->whereRaw('ifnull((json_unquote(json_extract(cotizacion_documento.getRegularizeResponse, "$.code"))),"0000") != "1033"');
 
-        if(!PuntoVenta() && !FullAccess())
-        {
-            $documentos = $documentos->where('user_id',Auth::user()->id);
+        if (!PuntoVenta() && !FullAccess()) {
+            $documentos = $documentos->where('user_id', Auth::user()->id);
         }
 
-        $documentos = $documentos->orderBy('cotizacion_documento.id','desc')->get();
-        foreach($documentos as $documento)
-        {
+        $documentos = $documentos->orderBy('cotizacion_documento.id', 'desc')->get();
+        foreach ($documentos as $documento) {
             Auth::user()->notify(new FacturacionNotification($documento));
         }
 
         // Regularizaciones
 
         $regularizaciones =  DB::table('cotizacion_documento')
-        ->select(
-            'cotizacion_documento.*',
-        )
-        ->orderBy('cotizacion_documento.id','DESC')
-        ->whereIn('cotizacion_documento.tipo_venta',['127','128'])
-        ->where('cotizacion_documento.estado', '!=','ANULADO')
-        ->where('cotizacion_documento.sunat', '!=','2')
-        ->where('cotizacion_documento.contingencia', '0')
-        ->where(DB::raw('JSON_EXTRACT(cotizacion_documento.getRegularizeResponse, "$.code")'),'1033')
-        ->where('cotizacion_documento.regularize','1');
+            ->select(
+                'cotizacion_documento.*',
+            )
+            ->orderBy('cotizacion_documento.id', 'DESC')
+            ->whereIn('cotizacion_documento.tipo_venta', ['127', '128'])
+            ->where('cotizacion_documento.estado', '!=', 'ANULADO')
+            ->where('cotizacion_documento.sunat', '!=', '2')
+            ->where('cotizacion_documento.contingencia', '0')
+            ->where(DB::raw('JSON_EXTRACT(cotizacion_documento.getRegularizeResponse, "$.code")'), '1033')
+            ->where('cotizacion_documento.regularize', '1');
 
-        if(!PuntoVenta() && !FullAccess())
-        {
-            $regularizaciones = $regularizaciones->where('user_id',Auth::user()->id);
+        if (!PuntoVenta() && !FullAccess()) {
+            $regularizaciones = $regularizaciones->where('user_id', Auth::user()->id);
         }
 
         $regularizaciones = $regularizaciones->get();
 
-        foreach($regularizaciones as $doc)
-        {
+        foreach ($regularizaciones as $doc) {
             Auth::user()->notify(new RegularizeNotification($doc));
         }
 
         // Notas
         $notas =  DB::table('nota_electronica')
-        ->select(
-            'nota_electronica.*',
-        )
-        ->whereIn('nota_electronica.tipDocAfectado', ['01', '03'])
-        ->where('nota_electronica.estado', '!=', 'ANULADO')
-        ->where('nota_electronica.sunat', '0');
+            ->select(
+                'nota_electronica.*',
+            )
+            ->whereIn('nota_electronica.tipDocAfectado', ['01', '03'])
+            ->where('nota_electronica.estado', '!=', 'ANULADO')
+            ->where('nota_electronica.sunat', '0');
 
         if (!PuntoVenta() && !FullAccess()) {
             $notas = $notas->where('user_id', Auth::user()->id);
@@ -1953,11 +1906,11 @@ if (!function_exists('refreshNotifications')) {
 
         // Guia
         $guias =  DB::table('guias_remision')
-        ->select(
-            'guias_remision.*',
-        )
-        ->where('guias_remision.estado', '!=', 'NULO')
-        ->where('guias_remision.sunat', '0');
+            ->select(
+                'guias_remision.*',
+            )
+            ->where('guias_remision.estado', '!=', 'NULO')
+            ->where('guias_remision.sunat', '0');
 
         if (!PuntoVenta() && !FullAccess()) {
             $guias = $guias->where('user_id', Auth::user()->id);
@@ -1970,13 +1923,13 @@ if (!function_exists('refreshNotifications')) {
 
         // Retenciones
         $retenciones =  DB::table('retencions')
-        ->join('cotizacion_documento', 'retencions.documento_id', '=', 'cotizacion_documento.id')
-        ->select(
-            'retencions.*',
-        )
-        ->where('cotizacion_documento.estado', '!=', 'ANULADO')
-        ->where('retencions.sunat', '0')
-        ->where('cotizacion_documento.sunat', '1');
+            ->join('cotizacion_documento', 'retencions.documento_id', '=', 'cotizacion_documento.id')
+            ->select(
+                'retencions.*',
+            )
+            ->where('cotizacion_documento.estado', '!=', 'ANULADO')
+            ->where('retencions.sunat', '0')
+            ->where('cotizacion_documento.sunat', '1');
 
         if (!PuntoVenta() && !FullAccess()) {
             $retenciones = $retenciones->where('cotizacion_documento.user_id', Auth::user()->id);
@@ -2003,7 +1956,12 @@ if (!function_exists('ifComprobanteSeleccionado')) {
         return $existe;
     }
 }
-
+if (!function_exists('getColores')) {
+    function getColores()
+    {
+        return Color::where('estado', 'ACTIVO')->get();
+    }
+}
 if (!function_exists('codigoPrecioMenor')) {
     function codigoPrecioMenor()
     {
@@ -2011,10 +1969,3 @@ if (!function_exists('codigoPrecioMenor')) {
         return $empresa;
     }
 }
-
-
-
-
-
-
-

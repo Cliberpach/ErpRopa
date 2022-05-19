@@ -2,6 +2,7 @@
 
 namespace App\Almacenes;
 
+use App\Color;
 use Illuminate\Database\Eloquent\Model;
 
 class Producto extends Model
@@ -25,6 +26,13 @@ class Producto extends Model
         'peso_producto',
         'porcentaje_normal',
         'porcentaje_distribuidor',
+        'color_id',
+        'modelo_id',
+        'tela_id',
+        'talla_id',
+        'sub_modelo_id',
+        'temporada_id',
+        'genero_id'
     ];
     protected $casts = [
         'igv' => 'boolean'
@@ -47,15 +55,15 @@ class Producto extends Model
     }
     public function tipoCliente()
     {
-        return $this->hasMany('App\Almacenes\TipoCliente','producto_id', 'id');
+        return $this->hasMany('App\Almacenes\TipoCliente', 'producto_id', 'id');
     }
     public function getDescripcionCompleta()
     {
-        return $this->codigo.' - '.$this->nombre;
+        return $this->codigo . ' - ' . $this->nombre;
     }
     public function tabladetalle()
     {
-        return $this->belongsTo('App\Mantenimiento\Tabla\Detalle','medida');
+        return $this->belongsTo('App\Mantenimiento\Tabla\Detalle', 'medida');
     }
     public function getMedida(): string
     {
@@ -71,6 +79,34 @@ class Producto extends Model
         if (is_null($medida))
             return "-";
         else
-            return $medida->simbolo.' - '.$medida->descripcion;
+            return $medida->simbolo . ' - ' . $medida->descripcion;
+    }
+    public function color()
+    {
+        return $this->hasOne(Color::class, 'color_id');
+    }
+    public function modelo()
+    {
+        return $this->hasOne(Modelo::class, 'modelo_id');
+    }
+    public function tela()
+    {
+        return $this->hasOne(Tela::class, 'tela_id');
+    }
+    public function talla()
+    {
+        return $this->hasOne(Talla::class, 'talla_id');
+    }
+    public function submodelo()
+    {
+        return $this->hasOne(SubModelo::class, 'submodelo_id');
+    }
+    public function temporada()
+    {
+        return $this->hasOne(Temporada::class, 'temporada_id');
+    }
+    public function genero()
+    {
+        return $this->hasOne(Genero::class, 'genero_id');
     }
 }

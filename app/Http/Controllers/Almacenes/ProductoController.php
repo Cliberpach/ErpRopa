@@ -112,6 +112,10 @@ class ProductoController extends Controller
             $producto->precio_venta_maximo = $request->get('precio_venta_maximo');
             $producto->peso_producto = $request->get('peso_producto');
             $producto->igv = $request->get('igv');
+            if($request->get('color_id'))
+            {
+                $producto->color_id=$request->color_id;
+            }
             $producto->save();
 
             $producto->codigo = 1000 + $producto->id;
@@ -231,6 +235,10 @@ class ProductoController extends Controller
         $producto->igv = $request->get('igv');
         $producto->peso_producto = $request->get('peso_producto');
         $producto->codigo_barra = $request->get('codigo_barra');
+        if($request->get('color_id'))
+        {
+            $producto->color_id=$request->color_id;
+        }
         $producto->update();
 
         if($request->get('codigo_barra'))
