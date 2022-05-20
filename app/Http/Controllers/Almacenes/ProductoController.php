@@ -53,6 +53,7 @@ class ProductoController extends Controller
             ->join('categorias', 'categorias.id', '=', 'productos.categoria_id')
             ->join('marcas', 'marcas.id', '=', 'productos.marca_id')
             ->join('almacenes', 'almacenes.id', '=', 'productos.almacen_id')
+            ->join('sub_modelo', 'sub_modelo.id', '=', 'productos.sub_modelo_id')
             ->join('temporada', 'temporada.id', '=', 'productos.temporada_id')
             ->join('genero', 'genero.id', '=', 'productos.genero_id')
             ->select('categorias.descripcion as categoria', 'almacenes.descripcion as almacen', 'marcas.marca', 'productos.*')
