@@ -811,6 +811,7 @@ Route::post('/getDocument', 'BuscarController@getDocumento')->name('buscar.getDo
 
 Route::get('ruta', function () {
     $productos = Producto::all();
+    return $productos;
     foreach ($productos as $producto) {
         TipoCliente::create([
             'cliente' => '121',
