@@ -72201,27 +72201,26 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 window.Pusher = __webpack_require__(/*! pusher-js */ "./node_modules/pusher-js/dist/web/pusher.js");
 /*En el servidor*/
-// window.Echo = new Echo({
-//     broadcaster: 'pusher',
-//     key: 'ASDASF2121',
-//     wsHost: window.location.hostname,
-//     wssPort: 6001,
-//     encrypted:false,
-//     disableStats:true,
-//     enabledTransports: ['ws', 'wss'],
-//     //forceTLS:false,
-// });
-
-/*En el local*/
 
 window.Echo = new laravel_echo__WEBPACK_IMPORTED_MODULE_0__["default"]({
   broadcaster: 'pusher',
   key: 'ASDASF2121',
   wsHost: window.location.hostname,
-  wsPort: 6001,
-  forceTLS: false,
-  disableStats: true
+  wssPort: 6001,
+  encrypted: false,
+  disableStats: true,
+  enabledTransports: ['ws', 'wss'] //forceTLS:false,
+
 });
+/*En el local
+window.Echo = new Echo({
+    broadcaster: 'pusher',
+    key: 'ASDASF2121',
+    wsHost: window.location.hostname,
+    wsPort: 6001,
+    forceTLS:false,
+    disableStats: true,
+});*/
 
 /***/ }),
 
@@ -72392,9 +72391,9 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! /home/pablo/Documentos/Git/ErpRopa/resources/js/app.js */"./resources/js/app.js");
-__webpack_require__(/*! /home/pablo/Documentos/Git/ErpRopa/resources/sass/app.scss */"./resources/sass/app.scss");
-module.exports = __webpack_require__(/*! /home/pablo/Documentos/Git/ErpRopa/resources/sass/appNotify.scss */"./resources/sass/appNotify.scss");
+__webpack_require__(/*! D:\ERP-ROPA\ErpRopa\resources\js\app.js */"./resources/js/app.js");
+__webpack_require__(/*! D:\ERP-ROPA\ErpRopa\resources\sass\app.scss */"./resources/sass/app.scss");
+module.exports = __webpack_require__(/*! D:\ERP-ROPA\ErpRopa\resources\sass\appNotify.scss */"./resources/sass/appNotify.scss");
 
 
 /***/ })
