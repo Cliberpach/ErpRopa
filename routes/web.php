@@ -192,7 +192,7 @@ Route::group(
         //Productos
         Route::prefix('almacenes/productos')->group(function () {
             Route::get('/', 'Almacenes\ProductoController@index')->name('almacenes.producto.index');
-            Route::post('/getTable', 'Almacenes\ProductoController@getTable')->name('almacenes.producto.getTable');
+            Route::get('/getTable', 'Almacenes\ProductoController@getTable')->name('almacenes.producto.getTable');
             Route::get('/registrar', 'Almacenes\ProductoController@create')->name('almacenes.producto.create');
             Route::post('/registrar', 'Almacenes\ProductoController@store')->name('almacenes.producto.store');
             Route::get('/actualizar/{id}', 'Almacenes\ProductoController@edit')->name('almacenes.producto.edit');

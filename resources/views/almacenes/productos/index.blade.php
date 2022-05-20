@@ -270,7 +270,7 @@
             'bAutoWidth': false,
             "ajax": {
                 url: "{{ route('almacenes.producto.getTable') }}",
-                type: 'POST',
+                type: 'GET',
                 data: {
                     categoria_id: categoria_id,
                     marca_id: marca_id,

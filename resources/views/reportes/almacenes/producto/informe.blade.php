@@ -725,7 +725,7 @@
                 'bAutoWidth': false,
                 "ajax": {
                     url: "{{ route('almacenes.producto.getTable') }}",
-                    type: 'POST',
+                    type: 'GET',
                 },
                 "columns": [{
                         data: 'codigo',
