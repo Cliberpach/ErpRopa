@@ -51,9 +51,8 @@ class ProductoController extends Controller
         return datatables()->query(
             DB::table('productos')
             ->join('categorias', 'categorias.id', '=', 'productos.categoria_id')
-            ->join('marcas', 'productos.marca_id', '=', 'marcas.id')
+            ->join('marcas', 'marcas.id', '=', 'productos.marca_id')
             ->join('almacenes', 'almacenes.id', '=', 'productos.almacen_id')
-            ->join('color', 'color.id', '=', 'productos.color_id')
             ->join('modelo', 'modelo.id', '=', 'productos.modelo_id')
             ->join('tela', 'tela.id', '=', 'productos.tela_id')
             ->join('talla', 'talla.id', '=', 'productos.talla_id')
