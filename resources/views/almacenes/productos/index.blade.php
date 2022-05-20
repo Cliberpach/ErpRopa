@@ -38,7 +38,7 @@
                 </div>
                 <div class="ibox-content" id="div_productos">
                     <div class="row justify-content-center">
-                        <div class="col-12">
+                        <!--<div class="col-12">
                             <div class="row align-items-end">
                                 <div class="col-12 col-md-3">
                                     <div class="form-group">
@@ -145,7 +145,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div>-->
                         <div class="col-12 col-md-1">
                             <div class="form-group">
                                 <a href="{{ route('almacenes.producto.getExcel') }}" class="btn btn-primary btn-block"><i class="fa fa-file-excel-o"></i></a>

@@ -32,7 +32,7 @@ class ProductoController extends Controller
     public function index()
     {
         $this->authorize('haveaccess', 'producto.index');
-        $categorias = Categoria::where('estado','ACTIVO')->get();
+        /*$categorias = Categoria::where('estado','ACTIVO')->get();
         $marcas = Marca::where('estado','ACTIVO')->get();
         $colores = Color::where('estado','ACTIVO')->get();
         $modelos = Modelo::where('estado','ACTIVO')->get();
@@ -40,8 +40,8 @@ class ProductoController extends Controller
         $tallas = Talla::where('estado','ACTIVO')->get();
         $submodelos = SubModelo::where('estado','ACTIVO')->get();
         $temporadas = Temporada::where('estado','ACTIVO')->get();
-        $generos = Genero::where('estado','ACTIVO')->get();
-        return view('almacenes.productos.index', compact('categorias','marcas','colores','modelos','telas','tallas','submodelos','temporadas','generos'));
+        $generos = Genero::where('estado','ACTIVO')->get();*/
+        return view('almacenes.productos.index');//, compact('categorias','marcas','colores','modelos','telas','tallas','submodelos','temporadas','generos')
     }
 
     public function getTable(Request $request)
