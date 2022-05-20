@@ -50,9 +50,16 @@ class ProductoController extends Controller
 
         return datatables()->query(
             DB::table('productos')
+            ->join('categorias', 'categorias.id', '=', 'productos.categoria_id')
             ->join('marcas', 'productos.marca_id', '=', 'marcas.id')
             ->join('almacenes', 'almacenes.id', '=', 'productos.almacen_id')
-            ->join('categorias', 'categorias.id', '=', 'productos.categoria_id')
+            ->join('color', 'color.id', '=', 'productos.color_id')
+            ->join('modelo', 'modelo.id', '=', 'productos.modelo_id')
+            ->join('tela', 'tela.id', '=', 'productos.tela_id')
+            ->join('talla', 'talla.id', '=', 'productos.talla_id')
+            ->join('sub_modelo', 'sub_modelo.id', '=', 'productos.sub_modelo_id')
+            ->join('temporada', 'temporada.id', '=', 'productos.temporada_id')
+            ->join('genero', 'genero.id', '=', 'productos.genero_id')
             ->select('categorias.descripcion as categoria', 'almacenes.descripcion as almacen', 'marcas.marca', 'productos.*')
             ->orderBy('productos.id', 'DESC')
             ->where('productos.estado', 'ACTIVO')
