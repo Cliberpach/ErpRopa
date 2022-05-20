@@ -24,45 +24,45 @@ class ProductoController extends Controller
 {
     public function index()
     {
-        $this->authorize('haveaccess','producto.index');
+        $this->authorize('haveaccess', 'producto.index');
         return view('almacenes.productos.index');
     }
 
     public function getTable()
     {
-        $this->authorize('haveaccess','producto.index');
+        $this->authorize('haveaccess', 'producto.index');
 
         return datatables()->query(
             DB::table('productos')
-            ->join('marcas','productos.marca_id','=','marcas.id')
-            ->join('almacenes','almacenes.id','=','productos.almacen_id')
-            ->join('categorias','categorias.id','=','productos.categoria_id')
-            ->select('categorias.descripcion as categoria','almacenes.descripcion as almacen','marcas.marca','productos.*')
-            ->orderBy('productos.id','DESC')
-            ->where('productos.estado', 'ACTIVO')
+                ->join('marcas', 'productos.marca_id', '=', 'marcas.id')
+                ->join('almacenes', 'almacenes.id', '=', 'productos.almacen_id')
+                ->join('categorias', 'categorias.id', '=', 'productos.categoria_id')
+                ->select('categorias.descripcion as categoria', 'almacenes.descripcion as almacen', 'marcas.marca', 'productos.*')
+                ->orderBy('productos.id', 'DESC')
+                ->where('productos.estado', 'ACTIVO')
         )->toJson();
     }
 
     public function create()
     {
-        $this->authorize('haveaccess','producto.index');
+        $this->authorize('haveaccess', 'producto.index');
         $marcas = Marca::where('estado', 'ACTIVO')->get();
         $almacenes = Almacen::where('estado', 'ACTIVO')->get();
         $categorias = Categoria::where('estado', 'ACTIVO')->get();
-        return view('almacenes.productos.create', compact('marcas', 'categorias','almacenes'));
+        return view('almacenes.productos.create', compact('marcas', 'categorias', 'almacenes'));
     }
 
     public function store(Request $request)
     {
-        $this->authorize('haveaccess','producto.index');
+        $this->authorize('haveaccess', 'producto.index');
         $data = $request->all();
         $rules = [
             // 'codigo' => ['string', 'max:50', Rule::unique('productos','codigo')->where(function ($query) {
             //     $query->whereIn('estado',["ACTIVO"]);
             // })],
-            'codigo_barra' => ['nullable',Rule::unique('productos','codigo_barra')->where(function ($query) {
-                $query->whereIn('estado',["ACTIVO"]);
-            }),'min:4','max:20'],
+            'codigo_barra' => ['nullable', Rule::unique('productos', 'codigo_barra')->where(function ($query) {
+                $query->whereIn('estado', ["ACTIVO"]);
+            }), 'min:4', 'max:20'],
             'nombre' => 'required',
             'marca' => 'required',
             'categoria' => 'required',
@@ -105,34 +105,39 @@ class ProductoController extends Controller
             $producto->marca_id = $request->get('marca');
             $producto->almacen_id = $request->get('almacen');
             $producto->categoria_id = $request->get('categoria');
-            $producto->medida = $request->get('medida');
+            // $producto->medida = $request->get('medida');
+            $producto->medida = 88;
             $producto->peso_producto = $request->get('peso_producto') ? $request->get('peso_producto') : 0;
             $producto->stock_minimo = $request->get('stock_minimo');
             $producto->precio_venta_minimo = $request->get('precio_venta_minimo');
             $producto->precio_venta_maximo = $request->get('precio_venta_maximo');
             $producto->peso_producto = $request->get('peso_producto');
             $producto->igv = $request->get('igv');
-            if($request->get('color_id'))
-            {
-                $producto->color_id=$request->color_id;
-            }
+
+            $producto->color_id = $request->color_id;
+            $producto->modelo_id=$request->modelo_id;
+            $producto->tela_id=$request->tela_id;
+            $producto->talla_id=$request->talla_id;
+            $producto->sub_modelo_id=$request->sub_modelo_id;
+            $producto->temporada_id=$request->temporada_id;
+            $producto->genero_id=$request->genero_id;
+
             $producto->save();
 
             $producto->codigo = 1000 + $producto->id;
             $producto->update();
 
-            if($request->get('codigo_barra'))
-            {
+            if ($request->get('codigo_barra')) {
                 $generatorPNG = new \Picqer\Barcode\BarcodeGeneratorPNG();
                 $code = base64_encode($generatorPNG->getBarcode($request->get('codigo_barra'), $generatorPNG::TYPE_CODE_128));
                 $data_code = base64_decode($code);
-                $name =  $producto->codigo_barra.'.png';
+                $name =  $producto->codigo_barra . '.png';
 
-                if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'productos'))) {
-                    mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'productos'));
+                if (!file_exists(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'productos'))) {
+                    mkdir(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'productos'));
                 }
 
-                $pathToFile = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'productos'.DIRECTORY_SEPARATOR.$name);
+                $pathToFile = storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'productos' . DIRECTORY_SEPARATOR . $name);
 
                 file_put_contents($pathToFile, $data_code);
             }
@@ -152,25 +157,23 @@ class ProductoController extends Controller
             }
 
             //Registro de actividad
-            $descripcion = "SE AGREGÓ EL PRODUCTO CON LA DESCRIPCION: ". $producto->nombre;
+            $descripcion = "SE AGREGÓ EL PRODUCTO CON LA DESCRIPCION: " . $producto->nombre;
             $gestion = "PRODUCTO";
-            crearRegistro($producto, $descripcion , $gestion);
-
-
+            crearRegistro($producto, $descripcion, $gestion);
         });
 
 
 
-        Session::flash('success','Producto creado.');
+        Session::flash('success', 'Producto creado.');
         return redirect()->route('almacenes.producto.index')->with('guardar', 'success');
     }
 
     public function edit($id)
     {
-        $this->authorize('haveaccess','producto.index');
+        $this->authorize('haveaccess', 'producto.index');
         $producto = Producto::findOrFail($id);
         $marcas = Marca::where('estado', 'ACTIVO')->get();
-        $clientes = TipoCliente::where('estado','ACTIVO')->where('producto_id',$id)->get();
+        $clientes = TipoCliente::where('estado', 'ACTIVO')->where('producto_id', $id)->get();
         $categorias = Categoria::where('estado', 'ACTIVO')->get();
         $almacenes = Almacen::where('estado', 'ACTIVO')->get();
 
@@ -185,15 +188,15 @@ class ProductoController extends Controller
 
     public function update(Request $request, $id)
     {
-        $this->authorize('haveaccess','producto.index');
+        $this->authorize('haveaccess', 'producto.index');
         $data = $request->all();
         $rules = [
             // 'codigo' => ['required','string', 'max:50', Rule::unique('productos','codigo')->where(function ($query) {
             //     $query->whereIn('estado',["ACTIVO"]);
             // })->ignore($id)],
-            'codigo_barra' => ['nullable',Rule::unique('productos','codigo_barra')->where(function ($query) {
-                $query->whereIn('estado',["ACTIVO"]);
-            })->ignore($id),'min:4','max:20'],
+            'codigo_barra' => ['nullable', Rule::unique('productos', 'codigo_barra')->where(function ($query) {
+                $query->whereIn('estado', ["ACTIVO"]);
+            })->ignore($id), 'min:4', 'max:20'],
             'nombre' => 'required',
             'almacen' => 'required',
             'marca' => 'required',
@@ -235,24 +238,26 @@ class ProductoController extends Controller
         $producto->igv = $request->get('igv');
         $producto->peso_producto = $request->get('peso_producto');
         $producto->codigo_barra = $request->get('codigo_barra');
-        if($request->get('color_id'))
-        {
-            $producto->color_id=$request->color_id;
-        }
+        $producto->color_id = $request->color_id;
+        $producto->modelo_id=$request->modelo_id;
+        $producto->tela_id=$request->tela_id;
+        $producto->talla_id=$request->talla_id;
+        $producto->sub_modelo_id=$request->sub_modelo_id;
+        $producto->temporada_id=$request->temporada_id;
+        $producto->genero_id=$request->genero_id;
         $producto->update();
 
-        if($request->get('codigo_barra'))
-        {
+        if ($request->get('codigo_barra')) {
             $generatorPNG = new \Picqer\Barcode\BarcodeGeneratorPNG();
             $code = base64_encode($generatorPNG->getBarcode($request->get('codigo_barra'), $generatorPNG::TYPE_CODE_128));
             $data_code = base64_decode($code);
-            $name =  $producto->codigo_barra.'.png';
+            $name =  $producto->codigo_barra . '.png';
 
-            if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'productos'))) {
-                mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'productos'));
+            if (!file_exists(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'productos'))) {
+                mkdir(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'productos'));
             }
 
-            $pathToFile = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'productos'.DIRECTORY_SEPARATOR.$name);
+            $pathToFile = storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'productos' . DIRECTORY_SEPARATOR . $name);
 
             file_put_contents($pathToFile, $data_code);
         }
@@ -264,7 +269,7 @@ class ProductoController extends Controller
         if ($clientetabla) {
             $clientes = TipoCliente::where('producto_id', $id)->get();
             foreach ($clientes as $cliente) {
-                $cliente->estado= "ANULADO";
+                $cliente->estado = "ANULADO";
                 $cliente->update();
             }
             foreach ($clientetabla as $cliente) {
@@ -282,28 +287,28 @@ class ProductoController extends Controller
                     'moneda' => $cliente->id_moneda,
                 ]);
             }
-        }else{
+        } else {
             $clientes = TipoCliente::where('producto_id', $id)->get();
             foreach ($clientes as $cliente) {
-                $cliente->estado= "ANULADO";
+                $cliente->estado = "ANULADO";
                 $cliente->update();
             }
         }
 
         //Registro de actividad
-        $descripcion = "SE MODIFICÓ EL PRODUCTO CON LA DESCRIPCION: ". $producto->nombre;
+        $descripcion = "SE MODIFICÓ EL PRODUCTO CON LA DESCRIPCION: " . $producto->nombre;
         $gestion = "PRODUCTO";
-        modificarRegistro($producto, $descripcion , $gestion);
+        modificarRegistro($producto, $descripcion, $gestion);
 
-        Session::flash('success','Producto modificado.');
+        Session::flash('success', 'Producto modificado.');
         return redirect()->route('almacenes.producto.index')->with('guardar', 'success');
     }
 
     public function show($id)
     {
-        $this->authorize('haveaccess','producto.index');
+        $this->authorize('haveaccess', 'producto.index');
         $producto = Producto::findOrFail($id);
-        $clientes = TipoCliente::where('estado','ACTIVO')->where('producto_id',$id)->get();
+        $clientes = TipoCliente::where('estado', 'ACTIVO')->where('producto_id', $id)->get();
         return view('almacenes.productos.show', [
             'producto' => $producto,
             'clientes' => $clientes,
@@ -312,19 +317,19 @@ class ProductoController extends Controller
 
     public function destroy($id)
     {
-        $this->authorize('haveaccess','producto.index');
+        $this->authorize('haveaccess', 'producto.index');
         $producto = Producto::findOrFail($id);
         $producto->estado = 'ANULADO';
         $producto->update();
 
-       // $producto->detalles()->update(['estado'=> 'ANULADO']);
+        // $producto->detalles()->update(['estado'=> 'ANULADO']);
 
         //Registro de actividad
-        $descripcion = "SE ELIMINÓ EL PRODUCTO CON LA DESCRIPCION: ". $producto->nombre;
+        $descripcion = "SE ELIMINÓ EL PRODUCTO CON LA DESCRIPCION: " . $producto->nombre;
         $gestion = "PRODUCTO";
-        eliminarRegistro($producto, $descripcion , $gestion);
+        eliminarRegistro($producto, $descripcion, $gestion);
 
-        Session::flash('success','Producto eliminado.');
+        Session::flash('success', 'Producto eliminado.');
         return redirect()->route('almacenes.producto.index')->with('eliminar', 'success');
     }
 
@@ -352,9 +357,9 @@ class ProductoController extends Controller
 
         if ($codigo && $id) { // edit
             $producto = Producto::where([
-                                    ['codigo', $data['codigo']],
-                                    ['id', '<>', $data['id']]
-                                ])->first();
+                ['codigo', $data['codigo']],
+                ['id', '<>', $data['id']]
+            ])->first();
         } else if ($codigo && !$id) { // create
             $producto = Producto::where('codigo', $data['codigo'])->first();
         }
@@ -367,17 +372,17 @@ class ProductoController extends Controller
     public function obtenerProducto($id)
     {
         $cliente_producto = DB::table('productos_clientes')
-                    ->join('productos', 'productos_clientes.producto_id', '=', 'productos.id')
-                    ->where('productos_clientes.estado','ACTIVO')
-                    ->where('productos_clientes.producto_id',$id)
-                    ->get();
+            ->join('productos', 'productos_clientes.producto_id', '=', 'productos.id')
+            ->where('productos_clientes.estado', 'ACTIVO')
+            ->where('productos_clientes.producto_id', $id)
+            ->get();
 
-        $producto = Producto::where('id',$id)->where('estado','ACTIVO')->first();
+        $producto = Producto::where('id', $id)->where('estado', 'ACTIVO')->first();
 
         $resultado = [
-                'cliente_producto' => $cliente_producto,
-                'producto' => $producto,
-            ];
+            'cliente_producto' => $cliente_producto,
+            'producto' => $producto,
+        ];
         return $resultado;
     }
 
@@ -394,12 +399,13 @@ class ProductoController extends Controller
     }
 
 
-    public function getProductos(){
+    public function getProductos()
+    {
         return datatables()->query(
             DB::table('productos')
-            ->join('categorias', 'productos.categoria_id', '=', 'categorias.id')
-            ->select('productos.*','categorias.descripcion as categoria')
-            ->where('productos.estado','ACTIVO')
+                ->join('categorias', 'productos.categoria_id', '=', 'categorias.id')
+                ->select('productos.*', 'categorias.descripcion as categoria')
+                ->where('productos.estado', 'ACTIVO')
         )->toJson();
     }
 
@@ -410,11 +416,12 @@ class ProductoController extends Controller
         ]);
     }
 
-    public function codigoBarras($id){
+    public function codigoBarras($id)
+    {
         ob_end_clean();
         ob_start();
         $producto = Producto::find($id);
-        return  Excel::download(new CodigoBarra($producto), $producto->codigo_barra.'.xlsx');
+        return  Excel::download(new CodigoBarra($producto), $producto->codigo_barra . '.xlsx');
     }
 
     public function getExcel()
@@ -422,5 +429,30 @@ class ProductoController extends Controller
         ob_end_clean(); // this
         ob_start();
         return  Excel::download(new ProductosExport, 'productos.xlsx');
+    }
+    public function autoComplete(
+        $categoria_id = null,
+        $marca_id = null,
+        $modelo_id = null,
+        $tela_id = null,
+        $color_id = null,
+        $talla_id = null,
+        $sub_modelo_id = null,
+        $temporada_id = null,
+        $genero_id = null,
+        $producto_id = null
+    ) {
+        $consulta = DB::table('productos as p')->where('p.estado', 'ACTIVO');
+        $consulta = $producto_id == "null" || $producto_id == null ? $consulta : $consulta->where('p.id', '!=', $producto_id);
+        $consulta = $categoria_id == "null" || $categoria_id == null ? $consulta : $consulta->where('p.categoria_id', $categoria_id);
+        $consulta = $marca_id == "null" || $marca_id == null ? $consulta : $consulta->where('p.marca_id', $marca_id);
+        $consulta = $modelo_id == "null" || $modelo_id == null ? $consulta : $consulta->where('p.modelo_id', $modelo_id);
+        $consulta = $tela_id == "null" || $tela_id == null ? $consulta : $consulta->where('p.tela_id', $tela_id);
+        $consulta = $color_id == "null" || $color_id == null ? $consulta : $consulta->where('p.color_id', $color_id);
+        $consulta = $talla_id == "null" || $talla_id == null ? $consulta : $consulta->where('p.talla_id', $talla_id);
+        $consulta = $sub_modelo_id == "null" || $sub_modelo_id == null ? $consulta : $consulta->where('p.sub_modelo_id', $sub_modelo_id);
+        $consulta = $temporada_id == "null" || $temporada_id == null ? $consulta : $consulta->where('p.temporada_id', $temporada_id);
+        $consulta = $genero_id == "null" || $genero_id == null ? $consulta : $consulta->where('p.genero_id', $genero_id);
+        return datatables()->query($consulta->select('p.nombre'))->toJson();
     }
 }
