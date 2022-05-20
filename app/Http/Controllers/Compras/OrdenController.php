@@ -120,7 +120,7 @@ class OrdenController extends Controller
         $this->authorize('haveaccess','orden.index');
         $empresas = Empresa::where('estado','ACTIVO')->get();
         $proveedores = Proveedor::where('estado','ACTIVO')->get();
-        $productos = Producto::where('estado','ACTIVO')->get();
+        $productos = [];
         $presentaciones =  presentaciones();
         $modos =  modo_compra();
         $fecha_hoy = Carbon::now()->toDateString();

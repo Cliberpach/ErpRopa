@@ -59,9 +59,7 @@ class ProductoController extends Controller
         ->join('sub_modelo', 'sub_modelo.id', '=', 'productos.sub_modelo_id')
         ->join('temporada', 'temporada.id', '=', 'productos.temporada_id')
         ->join('genero', 'genero.id', '=', 'productos.genero_id')
-        ->select('categorias.descripcion as categoria', 'almacenes.descripcion as almacen', 'marcas.marca', 'productos.*')
-        ->orderBy('productos.id', 'DESC')
-        ->where('productos.estado', 'ACTIVO');
+        ->select('categorias.descripcion as categoria', 'almacenes.descripcion as almacen', 'marcas.marca', 'productos.*');
 
         if($request->categoria_id != '')
         {
@@ -106,7 +104,10 @@ class ProductoController extends Controller
         if($request->genero_id != '')
         {
             $consulta = $consulta->where('productos.genero_id',$request->genero_id);
-        }        
+        }   
+        
+        $consulta = $consulta->orderBy('productos.id', 'DESC')
+        ->where('productos.estado', 'ACTIVO');
 
         return datatables()->query(
             $consulta
