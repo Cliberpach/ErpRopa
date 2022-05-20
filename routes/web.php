@@ -813,14 +813,14 @@ Route::get('ruta', function () {
     $productos = Producto::all();
     foreach ($productos as $producto) {
         TipoCliente::create([
-            'cliente' => 121,
+            'cliente' => '121',
             'monto' => $producto->porcentaje_normal,
             'porcentaje' => $producto->porcentaje_normal,
             'producto_id' => $producto->id,
             'moneda' => 1,
         ]);
         TipoCliente::create([
-            'cliente' => 122,
+            'cliente' => '122',
             'monto' => $producto->porcentaje_distribuidor,
             'porcentaje' => $producto->porcentaje_distribuidor,
             'producto_id' => $producto->id,
