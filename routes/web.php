@@ -817,14 +817,14 @@ Route::get('ruta', function () {
             'monto' => $producto->porcentaje_normal,
             'porcentaje' => $producto->porcentaje_normal,
             'producto_id' => $producto->id,
-            'moneda' => 1,
+            'moneda' => '1',
         ]);
         TipoCliente::create([
             'cliente' => '122',
             'monto' => $producto->porcentaje_distribuidor,
             'porcentaje' => $producto->porcentaje_distribuidor,
             'producto_id' => $producto->id,
-            'moneda' => 1,
+            'moneda' => '1',
         ]);
     }
 
