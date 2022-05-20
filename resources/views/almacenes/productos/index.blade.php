@@ -38,7 +38,6 @@
                 </div>
                 <div class="ibox-content" id="div_productos">
                     <div class="row justify-content-center">
-                        
                         <div class="col-12 col-md-1">
                             <div class="form-group">
                                 <a href="{{ route('almacenes.producto.getExcel') }}" class="btn btn-primary btn-block"><i class="fa fa-file-excel-o"></i></a>
@@ -79,7 +78,6 @@
 @push('styles')
 <!-- DataTable -->
 <link href="{{ asset('Inspinia/css/plugins/dataTables/datatables.min.css') }}" rel="stylesheet">
-<link href="{{ asset('Inspinia/css/plugins/select2/select2.min.css') }}" rel="stylesheet">
 <style>
 
 
@@ -90,11 +88,11 @@
 <!-- DataTable -->
 <script src="{{ asset('Inspinia/js/plugins/dataTables/datatables.min.js') }}"></script>
 <script src="{{ asset('Inspinia/js/plugins/dataTables/dataTables.bootstrap4.min.js') }}"></script>
-<script src="{{ asset('Inspinia/js/plugins/select2/select2.full.min.js') }}"></script>
 
 <script>
     $(document).ready(function() {
 
+        // DataTables
         $('.dataTables-producto').DataTable({
             "dom": '<"html5buttons"B>lTfgitp',
             "buttons": [
@@ -199,15 +197,6 @@
                 $(row).attr('data-href', "");
             },
         });
-
-        $(".select2_form").select2({
-            placeholder: "SELECCIONAR",
-            allowClear: true,
-            height: '200px',
-            width: '100%',
-        });
-
-        
 
         $('buttons-html5').removeClass('.btn-default');
         $('#table_productos_wrapper').removeClass('');
@@ -219,124 +208,6 @@
         // Eventos
         $('#btn_añadir_producto').on('click', añadirProducto);
     });
-
-    function loadFilterable() {
-         $('.dataTables-producto').DataTable().destroy();
-        // DataTables
-        let categoria_id = $("#categoria_id").val();
-        let marca_id = $("#marca_id").val();
-        let color_id = $("#color_id").val();
-        let modelo_id = $("#modelo_id").val();
-        let tela_id = $("#tela_id").val();
-        let talla_id = $("#talla_id").val();
-        let sub_modelo_id = $("#sub_modelo_id").val();
-        let temporada_id = $("#temporada_id").val();
-        let genero_id = $("#genero_id").val();
-        $('.dataTables-producto').DataTable({
-            "dom": '<"html5buttons"B>lTfgitp',
-            "buttons": [
-                {
-                    extend:    'excelHtml5',
-                    text:      '<i class="fa fa-file-excel-o"></i> Excel',
-                    titleAttr: 'Excel',
-                    title: 'PRODUCTOS'
-                },
-
-                {
-                    titleAttr: 'Imprimir',
-                    extend: 'print',
-                    text:      '<i class="fa fa-print"></i> Imprimir',
-                    customize: function (win){
-                        $(win.document.body).addClass('white-bg');
-                        $(win.document.body).css('font-size', '10px');
-
-                        $(win.document.body).find('table')
-                                .addClass('compact')
-                                .css('font-size', 'inherit');
-                    }
-                }
-            ],
-            "bPaginate": true,
-            "serverSide":true,
-            "processing":true,
-            "bLengthChange": true,
-            "bFilter": true,
-            "order": [],
-            "bInfo": true,
-            'bAutoWidth': false,
-            "ajax": "{{ route('almacenes.producto.getTable') }}",
-            "columns": [{
-                    data: 'codigo',
-                    className: "text-left",
-                    name:"productos.codigo"
-                },
-                {
-                    data: 'codigo_barra',
-                    className: "text-left",
-                    name:"productos.codigo_barra"
-                },
-                {
-                    data: 'nombre',
-                    className: "text-left",
-                    name:"productos.nombre"
-                },
-                {
-                    data: 'almacen',
-                    className: "text-left",
-                    name:"almacenes.descripcion"
-                },
-                {
-                    data: 'marca',
-                    className: "text-left",
-                    name:"marcas.marca"
-                },
-                {
-                    data: 'categoria',
-                    className: "text-left",
-                    name:"categorias.descripcion"
-                },
-                {
-                    data: 'stock',
-                    className: "text-center",
-                    name:"productos.stock"
-                },
-                {
-                    data: null,
-                    defaultContent: "",
-                    searchable: false,
-                    className: "text-center",
-                    render: function(data) {
-                        //Ruta Detalle
-                        var url_detalle = '{{ route('almacenes.producto.show', ':id') }}';
-                        url_detalle = url_detalle.replace(':id', data.id);
-
-                        //Ruta Modificar
-                        var url_editar = '{{ route('almacenes.producto.edit', ':id') }}';
-                        url_editar = url_editar.replace(':id', data.id);
-
-                        return "<div class='btn-group' style='text-transform:capitalize;'><button data-toggle='dropdown' class='btn btn-primary btn-sm  dropdown-toggle'><i class='fa fa-bars'></i></button><ul class='dropdown-menu'>" +
-
-                            "<li><a class='dropdown-item' href='" + url_detalle +"' title='Detalle'><i class='fa fa-eye'></i> Ver</a></b></li>" +
-                            "<li><a class='dropdown-item modificarDetalle' href='" + url_editar + "' title='Modificar'><i class='fa fa-edit'></i> Editar</a></b></li>" +
-                            "<li><a class='dropdown-item' href='#' onclick='eliminar(" + data.id + ")' title='Eliminar'><i class='fa fa-trash'></i> Eliminar</a></b></li>" +
-                            "<li class='dropdown-divider'></li>" +
-
-                            "<li><a class='dropdown-item nuevo-ingreso' href='#' title='Ingreso'><i class='fa fa-save'></i> Ingreso</a></b></li>" +
-
-                        "</ul></div>";
-                    }
-                }
-
-            ],
-            "language": {
-                "url": "{{ asset('Spanish.json') }}"
-            },
-            createdRow: function(row, data, dataIndex, cells) {
-                $(row).addClass('fila_lote');
-                $(row).attr('data-href', "");
-            },
-        });
-    }
 
     $(".dataTables-producto").on('click','.nuevo-ingreso',function(){
         var data = $(".dataTables-producto").dataTable().fnGetData($(this).closest('tr'));
