@@ -113,6 +113,17 @@ class ProductoController extends Controller
         )->toJson();
     }
 
+    public function getProductosSelect(Request $request)
+    {
+        return DB::table('productos')
+        ->join('categorias', 'categorias.id', '=', 'productos.categoria_id')
+        ->join('marcas', 'productos.marca_id', '=', 'marcas.id')
+        ->join('almacenes', 'almacenes.id', '=', 'productos.almacen_id')
+        ->select('categorias.descripcion as categoria', 'almacenes.descripcion as almacen', 'marcas.marca', 'productos.*')
+        ->orderBy('productos.id', 'DESC')
+        ->where('productos.estado', 'ACTIVO')->get();
+    }
+
     public function create()
     {
         $this->authorize('haveaccess', 'producto.index');
@@ -494,12 +505,13 @@ class ProductoController extends Controller
         return  Excel::download(new CodigoBarra($producto), $producto->codigo_barra . '.xlsx');
     }
 
-    public function getExcel()
+    public function getExcel(Request $request)
     {
         ob_end_clean(); // this
         ob_start();
-        return  Excel::download(new ProductosExport, 'productos.xlsx');
+        return  Excel::download(new ProductosExport($request->categoria_id, $request->marca_id, $request->color_id, $request->modelo_id, $request->tela_id, $request->talla_id, $request->sub_modelo_id, $request->temporada_id, $request->genero_id), 'productos.xlsx');
     }
+
     public function autoComplete(
         $categoria_id = null,
         $marca_id = null,

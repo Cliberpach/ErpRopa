@@ -469,6 +469,37 @@ $(document).ready(function() {
         $('#igv_requerido').removeClass("required")
     }
 
+    $('#producto_id').select2({
+        ajax: {
+            url: route('getProductosSelect'),
+            dataType: 'json',
+            type: 'post',
+            delay: 250,
+            data: function (params) {
+                var query = {
+                    search: params.term,
+                    page: params.page || 1
+                }
+
+                // Query parameters will be ?search=[term]&page=[page]
+                return query;
+            },
+            processResults: function (data, params) {
+                params.page = params.page || 1;
+
+                return {
+                    results: data.results,
+                    pagination: {
+                        more: (params.page * 10) < data.count_filtered
+                    }
+                };
+            },
+            cache: true
+        },
+        placeholder: 'Buscar producto',
+        minimumInputLength: 1
+    });
+
     obtenerProducts();
 });
 
@@ -988,8 +1019,9 @@ $(document).on("change", "#proveedor_id", function () {
 
     function obtenerProducts()
     {
-        $('#panel_detalle').children('.ibox-content').toggleClass('sk-loading');
+        /*$('#panel_detalle').children('.ibox-content').toggleClass('sk-loading');
         $("#producto_id").empty().trigger('change');
+        
         axios.get('{{ route('compras.documento.getProduct') }}').then(response => {
             let data = response.data.data
             console.log(data)
@@ -1009,7 +1041,7 @@ $(document).on("change", "#proveedor_id", function () {
                 $('#panel_detalle').children('.ibox-content').toggleClass('sk-loading');
                 toastr.error('Productos no encontrados.', 'Error');
             }
-        })
+        })*/
     }
 
 

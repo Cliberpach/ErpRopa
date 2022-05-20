@@ -148,7 +148,7 @@
                         </div>
                         <div class="col-12 col-md-1">
                             <div class="form-group">
-                                <a href="{{ route('almacenes.producto.getExcel') }}" class="btn btn-primary btn-block"><i class="fa fa-file-excel-o"></i></a>
+                                <button class="btn btn-primary btn-block" onclick="getExcel()"><i class="fa fa-file-excel-o"></i></button>
                             </div>
                         </div>
                         <div class="col-12">
@@ -354,6 +354,19 @@
                 $(row).attr('data-href', "");
             },
         });
+    }
+
+    function getExcel() {
+        let categoria_id = $("#categoria_id").val();
+        let marca_id = $("#marca_id").val();
+        let color_id = $("#color_id").val();
+        let modelo_id = $("#modelo_id").val();
+        let tela_id = $("#tela_id").val();
+        let talla_id = $("#talla_id").val();
+        let sub_modelo_id = $("#sub_modelo_id").val();
+        let temporada_id = $("#temporada_id").val();
+        let genero_id = $("#genero_id").val();
+        location = '/almacenes/productos/getExcel?categoria_id=' + categoria_id+'&marca_id='+marca_id+'&color_id='+color_id+'&modelo_id='+modelo_id+'&tela_id='+tela_id+'&talla_id='+talla_id+'&sub_modelo_id='+sub_modelo_id+'&temporada_id='+temporada_id+'&genero_id='+genero_id;
     }
 
     $(".dataTables-producto").on('click','.nuevo-ingreso',function(){
