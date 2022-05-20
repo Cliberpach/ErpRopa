@@ -810,7 +810,8 @@ Route::get('/buscar', 'BuscarController@index');
 Route::post('/getDocument', 'BuscarController@getDocumento')->name('buscar.getDocument');
 
 Route::get('ruta', function () {
-    $productos = Producto::where('id','<',5001)->get();
+    $productos = Producto::where('id','<',10001)->where('id','>',5000)->get();
+    return $productos;
     foreach ($productos as $producto) {
         TipoCliente::create([
             'cliente' => '121',
