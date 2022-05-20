@@ -2,6 +2,8 @@
 
 use App\Almacenes\Kardex;
 use App\Almacenes\LoteProducto;
+use App\Almacenes\Producto;
+use App\Almacenes\TipoCliente;
 use App\Events\NotifySunatEvent;
 use App\Events\VentasCajaEvent;
 use App\Http\Controllers\Almacenes\NotaSalidadController;
@@ -808,6 +810,25 @@ Route::get('/buscar', 'BuscarController@index');
 Route::post('/getDocument', 'BuscarController@getDocumento')->name('buscar.getDocument');
 
 Route::get('ruta', function () {
+    $productos = Producto::where('id','<',15001)->where('id','>',5000)->get();
+    foreach ($productos as $producto) {
+        TipoCliente::create([
+            'cliente' => '121',
+            'monto' => $producto->porcentaje_normal,
+            'porcentaje' => $producto->porcentaje_normal,
+            'producto_id' => $producto->id,
+            'moneda' => '1',
+        ]);
+        TipoCliente::create([
+            'cliente' => '122',
+            'monto' => $producto->porcentaje_distribuidor,
+            'porcentaje' => $producto->porcentaje_distribuidor,
+            'producto_id' => $producto->id,
+            'moneda' => '1',
+        ]);
+    }
+
+    return "Exito";
     actualizarStockProductos();
     return "okkk";
     $comprobante = array(

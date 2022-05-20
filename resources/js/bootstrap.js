@@ -34,16 +34,38 @@ import Echo from 'laravel-echo';
 window.Pusher = require('pusher-js');
 
 /*En el servidor*/
+<<<<<<< HEAD
+=======
 window.Echo = new Echo({
     broadcaster: 'pusher',
     key: 'ASDASF2121',
     wsHost: window.location.hostname,
+    wssPort: 6001,
+    encrypted: false,
+    disableStats: true,
+    enabledTransports: ['ws', 'wss'],
+    //forceTLS:false,
+});
+
+/*En el local
+>>>>>>> 25caa68adec72e9c33fc9705007d0e6a3865f008
+window.Echo = new Echo({
+    broadcaster: 'pusher',
+    key: 'ASDASF2121',
+    wsHost: window.location.hostname,
+<<<<<<< HEAD
     wssPort: 6001,
     encrypted:false,
     disableStats:true,
     enabledTransports: ['ws', 'wss'],
     //forceTLS:false,
 });
+=======
+    wsPort: 6001,
+    forceTLS:false,
+    disableStats: true,
+});*/
+>>>>>>> 25caa68adec72e9c33fc9705007d0e6a3865f008
 
 /*En el local*/
 // window.Echo = new Echo({
