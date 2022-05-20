@@ -38,6 +38,114 @@
                 </div>
                 <div class="ibox-content" id="div_productos">
                     <div class="row justify-content-center">
+                        <div class="col-12">
+                            <div class="row align-items-end">
+                                <div class="col-12 col-md-3">
+                                    <div class="form-group">
+                                        <label for="">Categoria</label>
+                                        <select name="categoria_id" id="categoria_id" class="select2_form form-control">
+                                            <option value=""></option>
+                                            @foreach ($categorias as $item)
+                                                <option value="{{ $item->id }}">{{ $item->descripcion }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-3">
+                                    <div class="form-group">
+                                        <label for="">Marca</label>
+                                        <select name="marca_id" id="marca_id" class="select2_form form-control">
+                                            <option value=""></option>
+                                            @foreach ($marcas as $item)
+                                                <option value="{{ $item->id }}">{{ $item->marca }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-3">
+                                    <div class="form-group">
+                                        <label for="">Color</label>
+                                        <select name="color_id" id="color_id" class="select2_form form-control">
+                                            <option value=""></option>
+                                            @foreach ($colores as $item)
+                                                <option value="{{ $item->id }}">{{ $item->nombre }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-3">
+                                    <div class="form-group">
+                                        <label for="">Modelo</label>
+                                        <select name="modelo_id" id="modelo_id" class="select2_form form-control">
+                                            <option value=""></option>
+                                            @foreach ($modelos as $item)
+                                                <option value="{{ $item->id }}">{{ $item->nombre }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-3">
+                                    <div class="form-group">
+                                        <label for="">Tela</label>
+                                        <select name="tela_id" id="tela_id" class="select2_form form-control">
+                                            <option value=""></option>
+                                            @foreach ($telas as $item)
+                                                <option value="{{ $item->id }}">{{ $item->nombre }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-3">
+                                    <div class="form-group">
+                                        <label for="">Talla</label>
+                                        <select name="talla_id" id="talla_id" class="select2_form form-control">
+                                            <option value=""></option>
+                                            @foreach ($tallas as $item)
+                                                <option value="{{ $item->id }}">{{ $item->nombre }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-3">
+                                    <div class="form-group">
+                                        <label for="">Submodelo</label>
+                                        <select name="sub_modelo_id" id="sub_modelo_id" class="select2_form form-control">
+                                            <option value=""></option>
+                                            @foreach ($submodelos as $item)
+                                                <option value="{{ $item->id }}">{{ $item->nombre }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-3">
+                                    <div class="form-group">
+                                        <label for="">Temporada</label>
+                                        <select name="temporada_id" id="temporada_id" class="select2_form form-control">
+                                            <option value=""></option>
+                                            @foreach ($temporadas as $item)
+                                                <option value="{{ $item->id }}">{{ $item->nombre }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-3">
+                                    <div class="form-group">
+                                        <label for="">Genero</label>
+                                        <select name="genero_id" id="genero_id" class="select2_form form-control">
+                                            <option value=""></option>
+                                            @foreach ($generos as $item)
+                                                <option value="{{ $item->id }}">{{ $item->nombre }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-3">
+                                    <div class="form-group">
+                                        <button class="btn btn-warning" onclick="loadFilterable()"><i class="fa fa-refresh"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="col-12 col-md-1">
                             <div class="form-group">
                                 <a href="{{ route('almacenes.producto.getExcel') }}" class="btn btn-primary btn-block"><i class="fa fa-file-excel-o"></i></a>
@@ -78,6 +186,7 @@
 @push('styles')
 <!-- DataTable -->
 <link href="{{ asset('Inspinia/css/plugins/dataTables/datatables.min.css') }}" rel="stylesheet">
+<link href="{{ asset('Inspinia/css/plugins/select2/select2.min.css') }}" rel="stylesheet">
 <style>
 
 
@@ -88,11 +197,45 @@
 <!-- DataTable -->
 <script src="{{ asset('Inspinia/js/plugins/dataTables/datatables.min.js') }}"></script>
 <script src="{{ asset('Inspinia/js/plugins/dataTables/dataTables.bootstrap4.min.js') }}"></script>
+<script src="{{ asset('Inspinia/js/plugins/select2/select2.full.min.js') }}"></script>
 
 <script>
     $(document).ready(function() {
 
+        loadFilterable();
+
+        $(".select2_form").select2({
+            placeholder: "SELECCIONAR",
+            allowClear: true,
+            height: '200px',
+            width: '100%',
+        });
+
+        
+
+        $('buttons-html5').removeClass('.btn-default');
+        $('#table_productos_wrapper').removeClass('');
+        $('.dataTables-productos tbody').on( 'click', 'tr', function () {
+                $('.dataTables-productos').DataTable().$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+        } );
+
+        // Eventos
+        $('#btn_añadir_producto').on('click', añadirProducto);
+    });
+
+    function loadFilterable() {
+         $('.dataTables-producto').DataTable().destroy();
         // DataTables
+        let categoria_id = $("#categoria_id").val();
+        let marca_id = $("#marca_id").val();
+        let color_id = $("#color_id").val();
+        let modelo_id = $("#modelo_id").val();
+        let tela_id = $("#tela_id").val();
+        let talla_id = $("#talla_id").val();
+        let sub_modelo_id = $("#sub_modelo_id").val();
+        let temporada_id = $("#temporada_id").val();
+        let genero_id = $("#genero_id").val();
         $('.dataTables-producto').DataTable({
             "dom": '<"html5buttons"B>lTfgitp',
             "buttons": [
@@ -125,7 +268,21 @@
             "order": [],
             "bInfo": true,
             'bAutoWidth': false,
-            "ajax": "{{ route('almacenes.producto.getTable') }}",
+            "ajax": {
+                url: "{{ route('almacenes.producto.getTable') }}",
+                type: 'POST',
+                data: {
+                    categoria_id: categoria_id,
+                    marca_id: marca_id,
+                    color_id: color_id,
+                    modelo_id: modelo_id,
+                    tela_id: tela_id,
+                    talla_id: talla_id,
+                    sub_modelo_id: sub_modelo_id,
+                    temporada_id: temporada_id,
+                    genero_id: genero_id,
+                }
+            },
             "columns": [{
                     data: 'codigo',
                     className: "text-left",
@@ -197,17 +354,7 @@
                 $(row).attr('data-href', "");
             },
         });
-
-        $('buttons-html5').removeClass('.btn-default');
-        $('#table_productos_wrapper').removeClass('');
-        $('.dataTables-productos tbody').on( 'click', 'tr', function () {
-                $('.dataTables-productos').DataTable().$('tr.selected').removeClass('selected');
-                $(this).addClass('selected');
-        } );
-
-        // Eventos
-        $('#btn_añadir_producto').on('click', añadirProducto);
-    });
+    }
 
     $(".dataTables-producto").on('click','.nuevo-ingreso',function(){
         var data = $(".dataTables-producto").dataTable().fnGetData($(this).closest('tr'));
