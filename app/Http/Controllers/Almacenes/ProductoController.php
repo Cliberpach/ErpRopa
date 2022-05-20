@@ -48,69 +48,14 @@ class ProductoController extends Controller
     {
         $this->authorize('haveaccess', 'producto.index');
 
-        $consulta = DB::table('productos')
-        ->join('categorias', 'categorias.id', '=', 'productos.categoria_id')
-        ->join('marcas', 'productos.marca_id', '=', 'marcas.id')
-        ->join('almacenes', 'almacenes.id', '=', 'productos.almacen_id')
-        ->join('color', 'color.id', '=', 'productos.color_id')
-        ->join('modelo', 'modelo.id', '=', 'productos.modelo_id')
-        ->join('tela', 'tela.id', '=', 'productos.tela_id')
-        ->join('talla', 'talla.id', '=', 'productos.talla_id')
-        ->join('sub_modelo', 'sub_modelo.id', '=', 'productos.sub_modelo_id')
-        ->join('temporada', 'temporada.id', '=', 'productos.temporada_id')
-        ->join('genero', 'genero.id', '=', 'productos.genero_id')
-        ->select('categorias.descripcion as categoria', 'almacenes.descripcion as almacen', 'marcas.marca', 'productos.*');
-
-        /*if($request->categoria_id != '')
-        {
-            $consulta = $consulta->where('productos.categoria_id',$request->categoria_id);
-        }
-
-        if($request->marca_id != '')
-        {
-            $consulta = $consulta->where('productos.marca_id',$request->marca_id);
-        }
-
-        if($request->color_id != '')
-        {
-            $consulta = $consulta->where('productos.color_id',$request->color_id);
-        }
-
-        if($request->modelo_id != '')
-        {
-            $consulta = $consulta->where('productos.modelo_id',$request->modelo_id);
-        }
-
-        if($request->tela_id != '')
-        {
-            $consulta = $consulta->where('productos.tela_id',$request->tela_id);
-        }
-
-        if($request->talla_id != '')
-        {
-            $consulta = $consulta->where('productos.talla_id',$request->talla_id);
-        }
-
-        if($request->sub_modelo_id != '')
-        {
-            $consulta = $consulta->where('productos.sub_modelo_id',$request->sub_modelo_id);
-        }
-
-        if($request->temporada_id != '')
-        {
-            $consulta = $consulta->where('productos.temporada_id',$request->temporada_id);
-        }
-
-        if($request->genero_id != '')
-        {
-            $consulta = $consulta->where('productos.genero_id',$request->genero_id);
-        } */ 
-        
-        $consulta = $consulta->orderBy('productos.id', 'DESC')
-        ->where('productos.estado', 'ACTIVO');
-
         return datatables()->query(
-            $consulta
+            DB::table('productos')
+            ->join('marcas', 'productos.marca_id', '=', 'marcas.id')
+            ->join('almacenes', 'almacenes.id', '=', 'productos.almacen_id')
+            ->join('categorias', 'categorias.id', '=', 'productos.categoria_id')
+            ->select('categorias.descripcion as categoria', 'almacenes.descripcion as almacen', 'marcas.marca', 'productos.*')
+            ->orderBy('productos.id', 'DESC')
+            ->where('productos.estado', 'ACTIVO')
         )->toJson();
     }
 
