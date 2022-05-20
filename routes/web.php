@@ -208,8 +208,8 @@ Route::group(
             Route::get('generarCode', 'Almacenes\ProductoController@generarCode')->name('generarCode');
 
             Route::get('/obtenerProducto/{id}', 'Almacenes\ProductoController@obtenerProducto')->name('almacenes.producto.obtenerProducto');
-
             Route::get('/productoDescripcion/{id}', 'Almacenes\ProductoController@productoDescripcion')->name('almacenes.producto.productoDescripcion');
+            Route::get('autoComplete/{categoria_id?}/{marca_id?}/{modelo_id?}/{tela_id?}/{color_id?}/{talla_id?}/{sub_modelo_id?}/{temporada_id?}/{genero_id?}/{producto_id?}', 'Almacenes\ProductoController@autoComplete')->name('almacenes.producto.autocomplete');
         });
         //Colores
         Route::prefix('almacenes/colores')->group(function () {

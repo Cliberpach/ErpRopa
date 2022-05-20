@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Http\Controllers\Reportes;
-
 use App\Almacenes\DetalleNotaIngreso;
 use App\Almacenes\DetalleNotaSalidad;
 use App\Almacenes\NotaIngreso;
@@ -14,14 +12,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
-
 class ProductoController extends Controller
 {
     public function informe()
     {
         return view('reportes.almacenes.producto.informe');
     }
-
     public function getTable()
     {
         return datatables()->query(
@@ -34,7 +30,6 @@ class ProductoController extends Controller
                 ->where('productos.estado', 'ACTIVO')
         )->toJson();
     }
-
     public function llenarCompras($id)
     {
         $compras = Detalle::where('producto_id', $id)->where('estado', 'ACTIVO')->orderBy('id', 'desc')->get();
@@ -54,7 +49,6 @@ class ProductoController extends Controller
         }
         return DataTables::of($coleccion)->make(true);
     }
-
     public function llenarVentas($id)
     {
         $ventas = DocumentoDetalle::orderBy('id', 'desc')->where('estado', 'ACTIVO')->get();
@@ -76,7 +70,6 @@ class ProductoController extends Controller
         }
         return DataTables::of($coleccion)->make(true);
     }
-
     public function llenarSalidas($id)
     {
         $salidas = DB::table('detalle_nota_salidad')
@@ -91,7 +84,7 @@ class ProductoController extends Controller
             'lote_productos.codigo_lote',
             'tabladetalles.descripcion as unidad'
         )
-        ->where('detalle_nota_salidad.producto_id', $id)    
+        ->where('detalle_nota_salidad.producto_id', $id)
         ->where('nota_salidad.estado', '!=', 'ANULADO')->get();
         $coleccion = collect([]);
         foreach ($salidas as $salida) {
@@ -105,7 +98,6 @@ class ProductoController extends Controller
         }
         return DataTables::of($coleccion)->make(true);
     }
-
     public function llenarIngresos($id)
     {
         $ingresos = DetalleNotaIngreso::orderBy('id', 'desc')->where('producto_id', $id)->get();
@@ -127,48 +119,38 @@ class ProductoController extends Controller
         }
         return DataTables::of($coleccion)->make(true);
     }
-
     public function updateIngreso(Request $request)
     {
         DB::beginTransaction();
         $data = $request->all();
-
         $rules = [
             'id' => 'required',
             'nota_ingreso_id' => 'required',
             'costo' => 'required',
-
         ];
-
         $message = [
             'id.required' => 'El id del detalle es obligatorio.',
             'nota_ingreso_id.required' => 'El id de la nota de ingreso es obligatorio.',
             'costo.required' => 'El campo costo es obligatorio.'
         ];
-
         $validator =  Validator::make($data, $rules, $message);
-
         if ($validator->fails()) {
             $clase = $validator->getMessageBag()->toArray();
             $cadena = "";
             foreach ($clase as $clave => $valor) {
                 $cadena =  $cadena . "$valor[0] ";
             }
-
             Session::flash('error', $cadena);
             DB::rollBack();
             return redirect()->route('reporte.producto.informe');
         }
-
         $notaingreso = NotaIngreso::find($request->nota_ingreso_id);
         $dolar = $notaingreso->dolar;
         if ($notaingreso->moneda == 'DOLARES') {
             $costo_soles = (float) $request->costo * (float) $dolar;
-
             $costo_dolares = (float) $request->costo;
         } else {
             $costo_soles = (float) $request->costo;
-
             $costo_dolares = (float) $request->costo / (float) $dolar;
         }
         $detalle = DetalleNotaIngreso::findOrFail($request->id);
@@ -177,20 +159,15 @@ class ProductoController extends Controller
         $detalle->costo_dolares = $costo_dolares;
         $detalle->valor_ingreso = $request->costo * $detalle->cantidad;
         $detalle->update();
-
         $notaingreso->total = $notaingreso->detalles->sum('valor_ingreso');
         if ($notaingreso->moneda == 'DOLARES') {
             $notaingreso->total_soles = (float) $notaingreso->detalles->sum('valor_ingreso') * (float) $dolar;
-
             $notaingreso->total_dolares = (float) $notaingreso->detalles->sum('valor_ingreso');
         } else {
             $notaingreso->total_soles = (float) $notaingreso->detalles->sum('valor_ingreso');
-
             $notaingreso->total_dolares = (float) $notaingreso->detalles->sum('valor_ingreso') / $dolar;
         }
-
         $notaingreso->update();
-
         Session::flash('success', 'Se actualizo correctamente el costo de ingreso.');
         DB::commit();
         return redirect()->route('reporte.producto.informe');

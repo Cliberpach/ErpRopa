@@ -1,7 +1,13 @@
 <?php
 
+use App\Almacenes\Genero;
 use App\Almacenes\LoteProducto;
+use App\Almacenes\Modelo;
 use App\Almacenes\Producto;
+use App\Almacenes\SubModelo;
+use App\Almacenes\Talla;
+use App\Almacenes\Tela;
+use App\Almacenes\Temporada;
 use App\Almacenes\TipoCliente;
 use App\Color;
 use App\Compras\CuentaProveedor;
@@ -1967,5 +1973,41 @@ if (!function_exists('codigoPrecioMenor')) {
     {
         $empresa = Empresa::first();
         return $empresa;
+    }
+}
+if (!function_exists('getModelos')) {
+    function getModelos()
+    {
+        return Modelo::where('estado', 'ACTIVO')->get();
+    }
+}
+if (!function_exists('getTallas')) {
+    function getTallas()
+    {
+        return Talla::where('estado', 'ACTIVO')->get();
+    }
+}
+if (!function_exists('getTelas')) {
+    function getTelas()
+    {
+        return Tela::where('estado', 'ACTIVO')->get();
+    }
+}
+if (!function_exists('getSubModelos')) {
+    function getSubModelos()
+    {
+        return SubModelo::where('estado', 'ACTIVO')->get();
+    }
+}
+if (!function_exists('getTemporadas')) {
+    function getTemporadas()
+    {
+        return Temporada::where('estado', 'ACTIVO')->get();
+    }
+}
+if (!function_exists('getGeneros')) {
+    function getGeneros()
+    {
+        return Genero::where('estado', 'ACTIVO')->get();
     }
 }

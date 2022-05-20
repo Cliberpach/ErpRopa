@@ -1,7 +1,6 @@
 @extends('layout') @section('content')
 @section('almacenes-active', 'active')
 @section('producto-active', 'active')
-
 <div class="row wrapper border-bottom white-bg page-heading">
     <div class="col-lg-12">
         <h2 style="text-transform:uppercase"><b>REGISTRAR NUEVO PRODUCTO TERMINADO</b></h2>
@@ -18,7 +17,6 @@
         </ol>
     </div>
 </div>
-
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
         <div class="col-lg-12">
@@ -44,9 +42,7 @@
                                             @endif
                                         </div>
                                     </div>
-
-
-                                    <div class="col-lg-6 col-xs-12">
+                                    {{-- <div class="col-lg-6 col-xs-12">
                                         <div class="form-group">
                                             <label class="required">Unidad de Medida</label>
                                             <select id="medida" name="medida"
@@ -65,6 +61,18 @@
                                                 </span>
                                             @endif
                                         </div>
+                                    </div> --}}
+                                    <div class="col-lg-6 col-xs-12">
+                                        <label class="required">Stock mínimo</label>
+                                        <input type="text" id="stock_minimo" name="stock_minimo"
+                                            class="form-control {{ $errors->has('stock_minimo') ? ' is-invalid' : '' }}"
+                                            value="{{ old('stock_minimo') }}" maxlength="10"
+                                            onkeypress="return isNumber(event);" required>
+                                        @if ($errors->has('stock_minimo'))
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $errors->first('stock_minimo') }}</strong>
+                                            </span>
+                                        @endif
                                     </div>
                                     <div class="col-lg-6 col-xs-12">
                                         <div class="form-group">
@@ -80,7 +88,6 @@
                                             @endif
                                         </div>
                                     </div>
-
                                     <div class="col-12">
                                         <div class="form-group">
                                             <label class="required">Descripción del Producto</label>
@@ -95,7 +102,6 @@
                                             @endif
                                         </div>
                                     </div>
-
                                     <div class="col-12">
                                         <div class="row align-items-end">
                                             <div class="col-12 col-md-10">
@@ -127,12 +133,11 @@
                                             </div>
                                         </div>
                                     </div>
-
                                     <div class="col-12">
                                         <div class="form-group">
                                             <label class="required">Marca</label>
                                             <select id="marca" name="marca"
-                                                class="select2_form form-control {{ $errors->has('marca') ? ' is-invalid' : '' }}"
+                                                class="autocomplete-producto select2_form form-control {{ $errors->has('marca') ? ' is-invalid' : '' }}"
                                                 required value="{{ old('marca') }}">
                                                 <option></option>
                                                 @foreach ($marcas as $marca)
@@ -152,7 +157,7 @@
                                         <div class="form-group">
                                             <label class="required">Categoria</label>
                                             <select id="categoria" name="categoria"
-                                                class="select2_form form-control {{ $errors->has('familia') ? ' is-invalid' : '' }}">
+                                                class="autocomplete-producto select2_form form-control {{ $errors->has('familia') ? ' is-invalid' : '' }}">
                                                 <option></option>
                                                 @foreach ($categorias as $categoria)
                                                     <option value="{{ $categoria->id }}"
@@ -167,7 +172,6 @@
                                             @endif
                                         </div>
                                     </div>
-
                                     <div class="col-lg-6 col-12">
                                         <div class="form-group">
                                             <label class="required">Almacén</label>
@@ -188,14 +192,12 @@
                                             @endif
                                         </div>
                                     </div>
-
                                 </div>
-
                             </div>
                             <div class="col-lg-6 col-xs-12">
                                 <h4><b>Cantidades y Precios</b></h4>
                                 <div class="form-group row">
-                                    <div class="col-lg-6 col-xs-12">
+                                    {{-- <div class="col-lg-6 col-xs-12">
                                         <label class="">Stock</label>
                                         <input type="text" id="stock" name="stock" readonly
                                             class="form-control {{ $errors->has('stock') ? ' is-invalid' : '' }}"
@@ -206,18 +208,33 @@
                                                 <strong>{{ $errors->first('stock') }}</strong>
                                             </span>
                                         @endif
-                                    </div>
+                                    </div> --}}
                                     <div class="col-lg-6 col-xs-12">
-                                        <label class="required">Stock mínimo</label>
-                                        <input type="text" id="stock_minimo" name="stock_minimo"
-                                            class="form-control {{ $errors->has('stock_minimo') ? ' is-invalid' : '' }}"
-                                            value="{{ old('stock_minimo') }}" maxlength="10"
-                                            onkeypress="return isNumber(event);" required>
-                                        @if ($errors->has('stock_minimo'))
-                                            <span class="invalid-feedback" role="alert">
-                                                <strong>{{ $errors->first('stock_minimo') }}</strong>
-                                            </span>
-                                        @endif
+                                        <label class="required">Incluye IGV</label>
+                                        <div class="radio">
+                                            <input type="radio" name="igv" id="igv_si" value="1" checked="">
+                                            <label for="igv_si">
+                                                SI
+                                            </label>
+                                        </div>
+                                        <div class="radio">
+                                            <input type="radio" name="igv" id="igv_no" value="0">
+                                            <label for="igv_no">
+                                                NO
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-lg-6 col-xs-12">
+                                        <label for="" class="required">Colores</label>
+                                        <select class="autocomplete-producto select2_form form-control"
+                                            style="text-transform: uppercase; width:100%" name="color_id" id="color_id">
+                                            <option></option>
+                                            @foreach (getColores() as $value)
+                                                <option value="{{ $value->id }}">
+                                                    {{ $value->nombre }}
+                                                </option>
+                                            @endforeach
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="form-group row d-none">
@@ -248,61 +265,132 @@
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <div class="col-lg-12 col-xs-12">
-                                        <label class="required">Incluye IGV</label>
-                                        <div class="row">
-                                            <div class="col-sm-6 col-xs-6">
-                                                <div class="radio">
-                                                    <input type="radio" name="igv" id="igv_si" value="1" checked="">
-                                                    <label for="igv_si">
-                                                        SI
-                                                    </label>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-6 col-xs-6">
-                                                <div class="radio">
-                                                    <input type="radio" name="igv" id="igv_no" value="0">
-                                                    <label for="igv_no">
-                                                        NO
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <div class="form-group col-lg-6 col-xs-12">
+                                        <label for="" class="required">Modelos</label>
+                                        <select class="autocomplete-producto select2_form form-control"
+                                            style="text-transform: uppercase; width:100%" name="modelo_id"
+                                            id="modelo_id">
+                                            <option></option>
+                                            @foreach (getModelos() as $value)
+                                                <option value="{{ $value->id }}">
+                                                    {{ $value->nombre }}
+                                                </option>
+                                            @endforeach
+                                        </select>
                                     </div>
-                                    <div class="col-lg-12">
-                                        <label for="required">Colores</label>
-                                        <div class="row">
-                                            <div class="col-sm-6">
-                                                <select class="select2_form form-control"
-                                                    style="text-transform: uppercase; width:100%" name="color_id"
-                                                    id="color_id">
-                                                    <option></option>
-                                                    @foreach (getColores() as $value)
-                                                        <option value="{{ $value->id }}">
-                                                            {{ $value->nombre }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
+                                    <div class="form-group col-lg-6 col-xs-12">
+                                        <label for="" class="required">Tallas</label>
+                                        <select class="autocomplete-producto select2_form form-control"
+                                            style="text-transform: uppercase; width:100%" name="talla_id" id="talla_id">
+                                            <option></option>
+                                            @foreach (getTallas() as $value)
+                                                <option value="{{ $value->id }}">
+                                                    {{ $value->nombre }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-lg-6 col-xs-12">
+                                        <label for="" class="required">Telas</label>
+                                        <select class="autocomplete-producto select2_form form-control"
+                                            style="text-transform: uppercase; width:100%" name="tela_id" id="tela_id">
+                                            <option></option>
+                                            @foreach (getTelas() as $value)
+                                                <option value="{{ $value->id }}">
+                                                    {{ $value->nombre }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-lg-6 col-xs-12">
+                                        <label for="" class="required">SubModelos</label>
+                                        <select class="autocomplete-producto select2_form form-control"
+                                            style="text-transform: uppercase; width:100%" name="sub_modelo_id"
+                                            id="sub_modelo_id">
+                                            <option></option>
+                                            @foreach (getSubModelos() as $value)
+                                                <option value="{{ $value->id }}">
+                                                    {{ $value->nombre }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-lg-6 col-xs-12">
+                                        <label for="" class="required">Temporadas</label>
+                                        <select class="autocomplete-producto select2_form form-control"
+                                            style="text-transform: uppercase; width:100%" name="temporada_id"
+                                            id="temporada_id">
+                                            <option></option>
+                                            @foreach (getTemporadas() as $value)
+                                                <option value="{{ $value->id }}">
+                                                    {{ $value->nombre }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-lg-6 col-xs-12">
+                                        <label for="" class="required">Generos</label>
+                                        <select class="autocomplete-producto select2_form form-control"
+                                            style="text-transform: uppercase; width:100%" name="genero_id"
+                                            id="genero_id">
+                                            <option></option>
+                                            @foreach (getGeneros() as $value)
+                                                <option value="{{ $value->id }}">
+                                                    {{ $value->nombre }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row ">
+                            <div class="col-lg-12">
+                                <div class="panel panel-primary">
+                                    <div class="panel-heading">
+                                        <h4 class=""><b>Productos</b>
+                                            <div style="float:right;">
+                                                <button type="button" class="btn btn-secondary btn-sm"
+                                                    data-toggle="collapse" data-target="#collapseAutoComplete"
+                                                    aria-expanded="true" aria-controls="collapseAutoComplete"><i
+                                                        class="fa fa-plus"></i></button>
                                             </div>
+                                        </h4>
+                                    </div>
+                                    <div class="panel-body collapse" id="collapseAutoComplete">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped table-bordered table-hover"
+                                                id="tableAutoComplete" style="text-transform:uppercase">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="text-center">NOMBRE</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                </tbody>
+                                            </table>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <hr>
-
-                        <div class="row">
-
+                        <div class="row ">
                             <div class="col-lg-12">
                                 <div class="panel panel-primary">
                                     <div class="panel-heading">
-                                        <h4 class=""><b>Detalle Segun el tipo de cliente</b></h4>
+                                        <h4 class=""><b>Detalle Segun el tipo de cliente</b>
+                                            <div style="float:right;">
+                                                <button type="button" class="btn btn-secondary btn-sm"
+                                                    data-toggle="collapse" data-target="#collapseExample"
+                                                    aria-expanded="false" aria-controls="collapseExample"><i
+                                                        class="fa fa-plus"></i></button>
+                                            </div>
+                                        </h4>
                                     </div>
-                                    <div class="panel-body">
-
-
+                                    <div class="panel-body collapse" id="collapseExample">
                                         <div class="row">
-
                                             <div class="col-md-4">
                                                 <label class="required">Cliente</label>
                                                 <select class="select2_form form-control"
@@ -341,18 +429,14 @@
                                                 <div class="invalid-feedback"><b><span
                                                             id="error-porcentaje"></span></b></div>
                                             </div>
-
                                             <div class="col-md-3">
                                                 <label class="">&nbsp;</label>
                                                 <a class="btn btn-block btn-warning enviar_cliente"
                                                     style='color:white;'> <i class="fa fa-plus"></i> AGREGAR</a>
                                             </div>
                                         </div>
-
                                         <input type="hidden" id="clientes_tabla" name="clientes_tabla[]">
-
                                         <hr>
-
                                         <div class="table-responsive">
                                             <table
                                                 class="table dataTables-clientes table-striped table-bordered table-hover"
@@ -363,22 +447,16 @@
                                                         <th class="text-center">CLIENTE</th>
                                                         <th class="text-center">MONEDA</th>
                                                         <th class="text-center">PORCENTAJE</th>
-
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-
                                                 </tbody>
-
                                             </table>
                                         </div>
-
                                     </div>
                                 </div>
                             </div>
-
                         </div>
-
                         <div class="hr-line-dashed"></div>
                         <div class="row">
                             <div class="col-lg-12">
@@ -408,7 +486,6 @@
 </div>
 @include('almacenes.productos.modal')
 @stop
-
 @push('styles')
 <link href="{{ asset('Inspinia/css/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css') }}"
     rel="stylesheet">
@@ -417,7 +494,6 @@
 <link href="{{ asset('Inspinia/css/plugins/select2/select2.min.css') }}" rel="stylesheet">
 <link href="{{ asset('Inspinia/css/plugins/dataTables/datatables.min.css') }}" rel="stylesheet">
 @endpush
-
 @push('scripts')
 <script src="{{ asset('Inspinia/js/plugins/iCheck/icheck.min.js') }}"></script>
 <script src="{{ asset('Inspinia/js/plugins/select2/select2.full.min.js') }}"></script>
@@ -432,18 +508,16 @@
         },
         buttonsStyling: false
     })
-
     $(document).ready(function() {
+        $("#collapseAutoComplete").collapse("show")
         $(".select2_form").select2({
             placeholder: "SELECCIONAR",
             allowClear: true,
             height: '200px',
             width: '100%',
         });
-
         //Controlar Error
         $.fn.DataTable.ext.errMode = 'throw';
-
         $("#codigo").on("change", validarCodigo);
         $('#form_registrar_producto').submit(function(e) {
             e.preventDefault();
@@ -475,7 +549,6 @@
                 }
             })
         });
-
     });
 
     function validarCodigo() {
@@ -508,8 +581,8 @@
         });
     }
 </script>
-
 <script>
+    var tableAutoComplete = null;
     $('#porcentaje').keyup(function() {
         var val = $(this).val();
         if (isNaN(val)) {
@@ -519,7 +592,6 @@
         }
         $(this).val(val);
     });
-
     $('#porcentaje_editar').keyup(function() {
         var val = $(this).val();
         if (isNaN(val)) {
@@ -529,11 +601,21 @@
         }
         $(this).val(val);
     });
-
-
     $(document).ready(function() {
-
-        // DataTables
+        tableAutoComplete = $('#tableAutoComplete').DataTable({
+            responsive: true,
+            "language": {
+                "url": "{{ asset('Spanish.json') }}"
+            },
+            "bAutoWidth": false,
+            "processing": true,
+            "serverSide": true,
+            "ajax": route("almacenes.producto.autocomplete"),
+            "columns": [{
+                data: 'nombre',
+                className: "text-left",
+            }, ]
+        });
         $('.dataTables-clientes').DataTable({
             "dom": 'lTfgitp',
             "bPaginate": true,
@@ -544,7 +626,6 @@
             "language": {
                 "url": "{{ asset('Spanish.json') }}"
             },
-
             "columnDefs": [{
                     "targets": [0],
                     className: "text-center",
@@ -572,14 +653,9 @@
                     visible: false,
                     className: "text-center",
                 }
-
             ],
-
         });
-
     })
-
-
     //Editar Registro
     $(document).on('click', '#editar_cliente', function(event) {
         var table = $('.dataTables-clientes').DataTable();
@@ -590,10 +666,8 @@
         $('#porcentaje_editar').val(data[3]);
         $('#modal_editar_cliente').modal('show');
     })
-
     //Borrar registro de articulos
     $(document).on('click', '#borrar_cliente', function(event) {
-
         const swalWithBootstrapButtons = Swal.mixin({
             customClass: {
                 confirmButton: 'btn btn-success',
@@ -601,7 +675,6 @@
             },
             buttonsStyling: false
         })
-
         Swal.fire({
             title: 'Opción Eliminar',
             text: "¿Seguro que desea eliminar Artículo?",
@@ -615,7 +688,6 @@
                 var table = $('.dataTables-clientes').DataTable();
                 table.row($(this).parents('tr')).remove().draw();
                 // sumaTotal()
-
             } else if (
                 /* Read more about handling dismissals below */
                 result.dismiss === Swal.DismissReason.cancel
@@ -627,11 +699,7 @@
                 )
             }
         })
-
-
-
     });
-
     //Validacion al ingresar tablas
     $(".enviar_cliente").click(function() {
         limpiarErrores()
@@ -648,25 +716,18 @@
                 enviar = true;
             }
         }
-
         if ($('#porcentaje').val() == '') {
-
             toastr.error('Ingrese el porcentaje del tipo de cliente.', 'Error');
             enviar = true;
-
             $("#porcentaje").addClass("is-invalid");
             $('#error-porcentaje').text('El campo Porcentaje es obligatorio.')
         }
-
         if ($('#moneda_cliente').val() == '') {
-
             toastr.error('Seleccione la moneda del tipo de cliente.', 'Error');
             enviar = true;
-
             $("#moneda_cliente").addClass("is-invalid");
             $('#error-moneda').text('El campo Moneda es obligatorio.')
         }
-
         if (enviar != true) {
             const swalWithBootstrapButtons = Swal.mixin({
                 customClass: {
@@ -675,7 +736,6 @@
                 },
                 buttonsStyling: false
             })
-
             Swal.fire({
                 title: 'Opción Agregar',
                 text: "¿Seguro que desea agregar Tipo de Cliente?",
@@ -686,17 +746,14 @@
                 cancelButtonText: "No, Cancelar",
             }).then((result) => {
                 if (result.isConfirmed) {
-
                     var detalle = {
                         cliente: $('#cliente').val(),
                         porcentaje: $('#porcentaje').val(),
                         moneda: $('#moneda_cliente').val(),
                         id_moneda: $('#moneda_cliente').val(),
                     }
-
                     limpiarDetalle()
                     agregarTabla(detalle);
-
                 } else if (
                     /* Read more about handling dismissals below */
                     result.dismiss === Swal.DismissReason.cancel
@@ -708,7 +765,6 @@
                     )
                 }
             })
-
         }
     })
 
@@ -724,7 +780,6 @@
         return existe
     }
 
-
     function agregarTabla(detalle) {
         var t = $('.dataTables-clientes').DataTable();
         t.row.add([
@@ -733,37 +788,27 @@
             cargarMoneda(detalle.moneda),
             Number(detalle.porcentaje).toFixed(2),
             detalle.moneda,
-
-
         ]).draw(false);
-
         cargarClientes()
     }
 
     function cargarMoneda(id) {
-
         var moneda = ""
-
         @foreach (tipos_moneda() as $tipo_moneda)
             if ("{{ $tipo_moneda->id }}" == id) {
                 moneda = "{{ $tipo_moneda->descripcion }}"
             }
         @endforeach
-
         return moneda
     }
 
     function cargarClientes() {
-
         var clientes = [];
         var table = $('.dataTables-clientes').DataTable();
         var data = table.rows().data();
-
         data.each(function(value, index) {
-
             var url = '{{ route('mantenimiento.tabla.detalle.getDetail', ':descripcion') }}';
             url = url.replace(':descripcion', value[1]);
-
             $.ajax({
                 url: url,
                 type: 'get',
@@ -778,7 +823,6 @@
                     $('#clientes_tabla').val(JSON.stringify(clientes));
                 },
             })
-
         });
     }
 
@@ -786,21 +830,16 @@
         $('#porcentaje').val('')
         $('#cliente').val($('#cliente option:first-child').val()).trigger('change');
         //$('#moneda_cliente').val($('#moneda_cliente option:first-child').val()).trigger('change');
-
     }
 
     function limpiarErrores() {
         $('#porcentaje').removeClass("is-invalid")
         $('#error-porcentaje').text('')
-
         $('#cliente').removeClass("is-invalid")
         $('#error-cliente').text('')
-
         $('#moneda_cliente').removeClass("is-invalid")
         $('#error-moneda').text('')
     }
-
-
     //CONSULTAR SI EXISTE EL CLIENTE TIPO CONSUMIDOR
     function buscarConsumidor() {
         var existe = false
@@ -811,6 +850,33 @@
             }
         });
         return existe
+    }
+    $(".autocomplete-producto").on('change', function() {
+        autoComplete();
+    });
+
+    function autoComplete() {
+        let marca_id = $("#marca").val();
+        let categoria_id = $("#categoria").val();
+        let modelo_id = $("#modelo_id").val();
+        let tela_id = $("#tela_id").val();
+        let color_id = $("#color_id").val();
+        let talla_id = $("#talla_id").val();
+        let sub_modelo_id = $("#sub_modelo_id").val();
+        let temporada_id = $("#temporada_id").val();
+        let genero_id = $("#genero_id").val();
+        tableAutoComplete.ajax.url(route('almacenes.producto.autocomplete', {
+            categoria_id: categoria_id == "" ? "null" : categoria_id,
+            marca_id: marca_id == "" ? "null" : marca_id,
+            modelo_id: modelo_id == "" ? "null" : modelo_id,
+            tela_id: tela_id == "" ? "null" : tela_id,
+            color_id: color_id == "" ? "null" : color_id,
+            talla_id: talla_id == "" ? "null" : talla_id,
+            sub_modelo_id: sub_modelo_id == "" ? "null" : sub_modelo_id,
+            temporada_id: temporada_id == "" ? "null" : temporada_id,
+            genero_id: genero_id == "" ? "null" : genero_id,
+            producto_id: "null",
+        })).load()
     }
 </script>
 @endpush
