@@ -268,21 +268,7 @@
             "order": [],
             "bInfo": true,
             'bAutoWidth': false,
-            "ajax": {
-                url: "{{ route('almacenes.producto.getTable') }}",
-                type: 'GET',
-                data: {
-                    categoria_id: categoria_id,
-                    marca_id: marca_id,
-                    color_id: color_id,
-                    modelo_id: modelo_id,
-                    tela_id: tela_id,
-                    talla_id: talla_id,
-                    sub_modelo_id: sub_modelo_id,
-                    temporada_id: temporada_id,
-                    genero_id: genero_id,
-                }
-            },
+            "ajax": "{{ route('almacenes.producto.getTable') }}",
             "columns": [{
                     data: 'codigo',
                     className: "text-left",
