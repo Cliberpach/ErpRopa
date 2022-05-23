@@ -70250,7 +70250,7 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! D:\ERP-ROPA\ErpRopa\resources\js\appNotify.js */"./resources/js/appNotify.js");
+module.exports = __webpack_require__(/*! /home/pablo/Documentos/Git/ErpRopa/resources/js/appNotify.js */"./resources/js/appNotify.js");
 
 
 /***/ })
