@@ -209,6 +209,7 @@ Route::group(
             Route::get('/getExcel', 'Almacenes\ProductoController@getExcel')->name('almacenes.producto.getExcel');
 
             Route::get('getProductos', 'Almacenes\ProductoController@getProductos')->name('getProductos');
+            Route::get('getProductosSelect', 'Almacenes\ProductoController@getProductosSelect')->name('getProductosSelect');
             Route::get('getProducto/{id}', 'Almacenes\ProductoController@getProducto')->name('getProducto');
             Route::get('generarCode', 'Almacenes\ProductoController@generarCode')->name('generarCode');
 

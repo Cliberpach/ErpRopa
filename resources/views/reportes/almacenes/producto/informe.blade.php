@@ -723,7 +723,10 @@
                 "order": [],
                 "bInfo": true,
                 'bAutoWidth': false,
-                "ajax": "{{ route('almacenes.producto.getTable') }}",
+                "ajax": {
+                    url: "{{ route('almacenes.producto.getTable') }}",
+                    type: 'GET',
+                },
                 "columns": [{
                         data: 'codigo',
                         className: "text-left",

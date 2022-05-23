@@ -433,7 +433,7 @@ class DocumentoController extends Controller
         $empresas = Empresa::where('estado', 'ACTIVO')->get();
         $clientes = Cliente::where('estado', 'ACTIVO')->get();
         $fecha_hoy = Carbon::now()->toDateString();
-        $productos = Producto::where('estado', 'ACTIVO')->get();
+        $productos = [];
         $condiciones = Condicion::where('estado', 'ACTIVO')->get();
 
         // $dolar_aux = json_encode(precio_dolar(), true);

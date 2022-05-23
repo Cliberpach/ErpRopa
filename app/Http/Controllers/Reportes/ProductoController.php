@@ -18,6 +18,7 @@ class ProductoController extends Controller
     {
         return view('reportes.almacenes.producto.informe');
     }
+
     public function getTable()
     {
         return datatables()->query(
@@ -30,6 +31,7 @@ class ProductoController extends Controller
                 ->where('productos.estado', 'ACTIVO')
         )->toJson();
     }
+    
     public function llenarCompras($id)
     {
         $compras = Detalle::where('producto_id', $id)->where('estado', 'ACTIVO')->orderBy('id', 'desc')->get();

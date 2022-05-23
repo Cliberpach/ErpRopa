@@ -4,10 +4,17 @@ namespace App\Http\Controllers\Almacenes;
 
 use App\Almacenes\Almacen;
 use App\Almacenes\Categoria;
+use App\Almacenes\Genero;
 use App\Almacenes\Marca;
+use App\Almacenes\Modelo;
 use App\Almacenes\Producto;
 use App\Almacenes\ProductoDetalle;
+use App\Almacenes\SubModelo;
+use App\Almacenes\Talla;
+use App\Almacenes\Tela;
+use App\Almacenes\Temporada;
 use App\Almacenes\TipoCliente;
+use App\Color;
 use App\Exports\Producto\CodigoBarra;
 use App\Exports\Producto\ProductosExport;
 use App\Http\Controllers\Controller;
@@ -25,22 +32,96 @@ class ProductoController extends Controller
     public function index()
     {
         $this->authorize('haveaccess', 'producto.index');
-        return view('almacenes.productos.index');
+        $categorias = Categoria::where('estado','ACTIVO')->get();
+        $marcas = Marca::where('estado','ACTIVO')->get();
+        $colores = Color::where('estado','ACTIVO')->get();
+        $modelos = Modelo::where('estado','ACTIVO')->get();
+        $telas = Tela::where('estado','ACTIVO')->get();
+        $tallas = Talla::where('estado','ACTIVO')->get();
+        $submodelos = SubModelo::where('estado','ACTIVO')->get();
+        $temporadas = Temporada::where('estado','ACTIVO')->get();
+        $generos = Genero::where('estado','ACTIVO')->get();
+        return view('almacenes.productos.index', compact('categorias','marcas','colores','modelos','telas','tallas','submodelos','temporadas','generos'));
     }
 
-    public function getTable()
+    public function getTable(Request $request)
     {
         $this->authorize('haveaccess', 'producto.index');
 
+        $consulta = DB::table('productos')
+        ->join('categorias', 'categorias.id', '=', 'productos.categoria_id')
+        ->join('marcas', 'productos.marca_id', '=', 'marcas.id')
+        ->join('almacenes', 'almacenes.id', '=', 'productos.almacen_id')
+        ->join('color', 'color.id', '=', 'productos.color_id')
+        ->join('modelo', 'modelo.id', '=', 'productos.modelo_id')
+        ->join('tela', 'tela.id', '=', 'productos.tela_id')
+        ->join('talla', 'talla.id', '=', 'productos.talla_id')
+        ->join('sub_modelo', 'sub_modelo.id', '=', 'productos.sub_modelo_id')
+        ->join('temporada', 'temporada.id', '=', 'productos.temporada_id')
+        ->join('genero', 'genero.id', '=', 'productos.genero_id')
+        ->select('categorias.descripcion as categoria', 'almacenes.descripcion as almacen', 'marcas.marca', 'productos.*')
+        ->orderBy('productos.id', 'DESC')
+        ->where('productos.estado', 'ACTIVO');
+
+        if($request->categoria_id)
+        {
+            $consulta = $consulta->where('productos.categoria_id',$request->categoria_id);
+        }
+
+        if($request->marca_id)
+        {
+            $consulta = $consulta->where('productos.marca_id',$request->marca_id);
+        }
+
+        if($request->color_id)
+        {
+            $consulta = $consulta->where('productos.color_id',$request->color_id);
+        }
+
+        if($request->modelo_id)
+        {
+            $consulta = $consulta->where('productos.modelo_id',$request->modelo_id);
+        }
+
+        if($request->tela_id)
+        {
+            $consulta = $consulta->where('productos.tela_id',$request->tela_id);
+        }
+
+        if($request->talla_id)
+        {
+            $consulta = $consulta->where('productos.talla_id',$request->talla_id);
+        }
+
+        if($request->sub_modelo_id)
+        {
+            $consulta = $consulta->where('productos.sub_modelo_id',$request->sub_modelo_id);
+        }
+
+        if($request->temporada_id)
+        {
+            $consulta = $consulta->where('productos.temporada_id',$request->temporada_id);
+        }
+
+        if($request->genero_id)
+        {
+            $consulta = $consulta->where('productos.genero_id',$request->genero_id);
+        }        
+
         return datatables()->query(
-            DB::table('productos')
-                ->join('marcas', 'productos.marca_id', '=', 'marcas.id')
-                ->join('almacenes', 'almacenes.id', '=', 'productos.almacen_id')
-                ->join('categorias', 'categorias.id', '=', 'productos.categoria_id')
-                ->select('categorias.descripcion as categoria', 'almacenes.descripcion as almacen', 'marcas.marca', 'productos.*')
-                ->orderBy('productos.id', 'DESC')
-                ->where('productos.estado', 'ACTIVO')
+            $consulta
         )->toJson();
+    }
+
+    public function getProductosSelect(Request $request)
+    {
+        return DB::table('productos')
+        ->join('categorias', 'categorias.id', '=', 'productos.categoria_id')
+        ->join('marcas', 'productos.marca_id', '=', 'marcas.id')
+        ->join('almacenes', 'almacenes.id', '=', 'productos.almacen_id')
+        ->select('categorias.descripcion as categoria', 'almacenes.descripcion as almacen', 'marcas.marca', 'productos.*')
+        ->orderBy('productos.id', 'DESC')
+        ->where('productos.estado', 'ACTIVO')->get();
     }
 
     public function create()
@@ -424,12 +505,13 @@ class ProductoController extends Controller
         return  Excel::download(new CodigoBarra($producto), $producto->codigo_barra . '.xlsx');
     }
 
-    public function getExcel()
+    public function getExcel(Request $request)
     {
         ob_end_clean(); // this
         ob_start();
-        return  Excel::download(new ProductosExport, 'productos.xlsx');
+        return  Excel::download(new ProductosExport($request->categoria_id, $request->marca_id, $request->color_id, $request->modelo_id, $request->tela_id, $request->talla_id, $request->sub_modelo_id, $request->temporada_id, $request->genero_id), 'productos.xlsx');
     }
+
     public function autoComplete(
         $categoria_id = null,
         $marca_id = null,
