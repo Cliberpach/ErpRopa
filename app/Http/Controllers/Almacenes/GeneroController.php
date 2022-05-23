@@ -133,4 +133,15 @@ class GeneroController extends Controller
             return array("success" => false, "data" => null, "response" => $e->getMessage());
         }
     }
+
+    public function getListSelect(Request $request)
+    {
+        $sBuscar = $request->get('search');
+        $results = DB::table('genero');
+        if ($sBuscar) {
+            $results = $results->where('genero.nombre', 'like', '%' . $sBuscar . '%');
+        }
+        $results = $results->select('genero.id', 'genero.nombre as text')->where('genero.estado', 'ACTIVO')->paginate(10);
+        return response()->json($results);
+    }
 }

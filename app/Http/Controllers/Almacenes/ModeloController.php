@@ -19,6 +19,7 @@ class ModeloController extends Controller
     {
         return view('almacenes.modelos.index');
     }
+
     public function getModelo()
     {
         $modelos = Modelo::where('estado', 'ACTIVO')->orderBy('id', 'DESC')->get();
@@ -34,6 +35,7 @@ class ModeloController extends Controller
         }
         return DataTables::of($coleccion)->toJson();
     }
+
     public function store(Request $request)
     {
         //$this->authorize('haveaccess','color.index');
@@ -118,6 +120,7 @@ class ModeloController extends Controller
 
         return response()->json($result);
     }
+    
     public function storeApi(Request $request)
     {
         DB::beginTransaction();
@@ -132,5 +135,16 @@ class ModeloController extends Controller
             Log::info($e);
             return array("success" => false, "data" => null, "response" => $e->getMessage());
         }
+    }
+
+    public function getListSelect(Request $request)
+    {
+        $sBuscar = $request->get('search');
+        $results = DB::table('modelo');
+        if($sBuscar) {
+            $results = $results->where('modelo.nombre', 'like','%'.$sBuscar.'%');
+        }
+        $results = $results->select('modelo.id', 'modelo.nombre as text')->where('modelo.estado', 'ACTIVO')->paginate(10);
+        return response()->json($results);
     }
 }

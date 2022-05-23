@@ -32,16 +32,7 @@ class ProductoController extends Controller
     public function index()
     {
         $this->authorize('haveaccess', 'producto.index');
-        $categorias = Categoria::where('estado','ACTIVO')->get();
-        $marcas = Marca::where('estado','ACTIVO')->get();
-        $colores = Color::where('estado','ACTIVO')->get();
-        $modelos = Modelo::where('estado','ACTIVO')->get();
-        $telas = Tela::where('estado','ACTIVO')->get();
-        $tallas = Talla::where('estado','ACTIVO')->get();
-        $submodelos = SubModelo::where('estado','ACTIVO')->get();
-        $temporadas = Temporada::where('estado','ACTIVO')->get();
-        $generos = Genero::where('estado','ACTIVO')->get();
-        return view('almacenes.productos.index', compact('categorias','marcas','colores','modelos','telas','tallas','submodelos','temporadas','generos'));
+        return view('almacenes.productos.index');
     }
 
     public function getTable(Request $request)
@@ -117,19 +108,22 @@ class ProductoController extends Controller
     {
         $sBuscar = $request->get('search');
         $perPage = 10;
+        $lstProductos_aux = DB::table('productos');
+        if ($sBuscar) {
+            $lstBuscar = explode(' ', $sBuscar, 3);
 
-        $lstBuscar = explode(' ', $sBuscar, 3);
+            //$sBusqueda0 = '%' . $lstBuscar[0] . '%';
+            $sBusqueda0 = '%' . $sBuscar. '%';
+            $lstProductos_aux = $lstProductos_aux->where('nombre', 'like', $sBusqueda0);
 
-        $sBusqueda0 = '%' . $lstBuscar[0] . '%';
-        $lstProductos_aux = DB::table('productos')->where('nombre', 'like', $sBusqueda0);
-
-        if (count($lstBuscar) > 1) {
-            foreach ($lstBuscar as $i => $sBuscando) {
-                if (strlen(trim($sBuscando)) > 2 && $i > 0) {
-                    $sBusqueda = '%' . $sBuscando . '%';
-                    $lstProductos_aux = $lstProductos_aux->orWhere('nombre', 'like', $sBusqueda);
+            /*if (count($lstBuscar) > 1) {
+                foreach ($lstBuscar as $i => $sBuscando) {
+                    if (strlen(trim($sBuscando)) > 2 && $i > 0) {
+                        $sBusqueda = '%' . $sBuscando . '%';
+                        $lstProductos_aux = $lstProductos_aux->orWhere('nombre', 'like', $sBusqueda);
+                    }
                 }
-            }
+            }*/
         }
 
         $results = $lstProductos_aux->select('productos.id', 'productos.nombre as text')->paginate($perPage);

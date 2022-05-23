@@ -119,4 +119,15 @@ class TallaController extends Controller
             return array("success" => false, "data" => null, "response" => $e->getMessage());
         }
     }
+
+    public function getListSelect(Request $request)
+    {
+        $sBuscar = $request->get('search');
+        $results = DB::table('talla');
+        if ($sBuscar) {
+            $results = $results->where('talla.nombre', 'like', '%' . $sBuscar . '%');
+        }
+        $results = $results->select('talla.id', 'talla.nombre as text')->where('talla.estado', 'ACTIVO')->paginate(10);
+        return response()->json($results);
+    }
 }

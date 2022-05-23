@@ -133,4 +133,15 @@ class SubModeloController extends Controller
             return array("success" => false, "data" => null, "response" => $e->getMessage());
         }
     }
+
+    public function getListSelect(Request $request)
+    {
+        $sBuscar = $request->get('search');
+        $results = DB::table('sub_modelo');
+        if ($sBuscar) {
+            $results = $results->where('sub_modelo.nombre', 'like', '%' . $sBuscar . '%');
+        }
+        $results = $results->select('sub_modelo.id', 'sub_modelo.nombre as text')->where('sub_modelo.estado', 'ACTIVO')->paginate(10);
+        return response()->json($results);
+    }
 }

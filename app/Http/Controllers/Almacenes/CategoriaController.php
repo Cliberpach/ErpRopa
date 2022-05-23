@@ -124,4 +124,15 @@ class CategoriaController extends Controller
         $result = ['existe' => $categoria_existe ? true : false];
         return response()->json($result);
     }
+
+    public function getListSelect(Request $request)
+    {
+        $sBuscar = $request->get('search');
+        $results = DB::table('categorias');
+        if ($sBuscar) {
+            $results = $results->where('categorias.descripcion', 'like', '%' . $sBuscar . '%');
+        }
+        $results = $results->select('categorias.id', 'categorias.descripcion as text')->where('categorias.estado', 'ACTIVO')->paginate(10);
+        return response()->json($results);
+    }
 }

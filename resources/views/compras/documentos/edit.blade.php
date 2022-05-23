@@ -586,8 +586,8 @@ $(document).ready(function() {
             },
             cache: true
         },
-        placeholder: 'Buscar producto',
-        minimumInputLength: 3,
+        placeholder: 'Buscar producto',     
+        allowClear: true,
         language: {
 
             errorLoading: function () {

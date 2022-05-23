@@ -134,4 +134,15 @@ class TemporadaController extends Controller
             return array("success" => false, "data" => null, "response" => $e->getMessage());
         }
     }
+
+    public function getListSelect(Request $request)
+    {
+        $sBuscar = $request->get('search');
+        $results = DB::table('temporada');
+        if ($sBuscar) {
+            $results = $results->where('temporada.nombre', 'like', '%' . $sBuscar . '%');
+        }
+        $results = $results->select('temporada.id', 'temporada.nombre as text')->where('temporada.estado', 'ACTIVO')->paginate(10);
+        return response()->json($results);
+    }
 }

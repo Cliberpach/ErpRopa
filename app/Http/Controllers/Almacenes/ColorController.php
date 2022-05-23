@@ -119,4 +119,15 @@ class ColorController extends Controller
             return array("success" => false, "data" => null, "response" => $e->getMessage());
         }
     }
+
+    public function getListSelect(Request $request)
+    {
+        $sBuscar = $request->get('search');
+        $results = DB::table('color');
+        if ($sBuscar) {
+            $results = $results->where('color.nombre', 'like', '%' . $sBuscar . '%');
+        }
+        $results = $results->select('color.id', 'color.nombre as text')->where('color.estado', 'ACTIVO')->paginate(10);
+        return response()->json($results);
+    }
 }

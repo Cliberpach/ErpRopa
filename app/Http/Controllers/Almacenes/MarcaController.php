@@ -137,6 +137,7 @@ class MarcaController extends Controller
         return response()->json($result);
 
     }
+
     public function storeApi(Request $request)
     {
         DB::beginTransaction();
@@ -151,5 +152,16 @@ class MarcaController extends Controller
             Log::info($e);
             return array("success" => false, "data" => null, "response" => $e->getMessage());
         }
+    }
+
+    public function getListSelect(Request $request)
+    {
+        $sBuscar = $request->get('search');
+        $results = DB::table('marcas');
+        if ($sBuscar) {
+            $results = $results->where('marcas.marca', 'like', '%' . $sBuscar . '%');
+        }
+        $results = $results->select('marcas.id', 'marcas.marca as text')->where('marcas.estado', 'ACTIVO')->paginate(10);
+        return response()->json($results);
     }
 }
