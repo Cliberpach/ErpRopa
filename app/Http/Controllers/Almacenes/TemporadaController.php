@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Almacenes;
 use App\Almacenes\Temporada;
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\DataTables;
@@ -115,5 +118,20 @@ class TemporadaController extends Controller
         $result = ['existe' => ($temporada_existe) ? true : false];
 
         return response()->json($result);
+    }
+    public function storeApi(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $temporada = new Temporada();
+            $temporada->nombre = $request->nombre;
+            $temporada->save();
+            DB::commit();
+            return array("success" => true, "data" => $temporada, "response" => "Registro con Exito");
+        } catch (Exception $e) {
+            DB::rollback();
+            Log::info($e);
+            return array("success" => false, "data" => null, "response" => $e->getMessage());
+        }
     }
 }

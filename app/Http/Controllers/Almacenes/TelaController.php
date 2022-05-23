@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Almacenes;
 use App\Almacenes\Tela;
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
@@ -114,5 +117,20 @@ class TelaController extends Controller
         $result = ['existe' => ($tela_existe) ? true : false];
 
         return response()->json($result);
+    }
+    public function storeApi(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $tela = new Tela();
+            $tela->nombre = $request->nombre;
+            $tela->save();
+            DB::commit();
+            return array("success" => true, "data" => $tela, "response" => "Registro con Exito");
+        } catch (Exception $e) {
+            DB::rollback();
+            Log::info($e);
+            return array("success" => false, "data" => null, "response" => $e->getMessage());
+        }
     }
 }

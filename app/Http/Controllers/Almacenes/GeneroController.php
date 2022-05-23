@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Almacenes;
 use App\Almacenes\Genero;
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\DataTables;
@@ -114,5 +117,20 @@ class GeneroController extends Controller
         $result = ['existe' => ($genero_existe) ? true : false];
 
         return response()->json($result);
+    }
+    public function storeApi(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $genero = new Genero();
+            $genero->nombre = $request->nombre;
+            $genero->save();
+            DB::commit();
+            return array("success" => true, "data" => $genero, "response" => "Registro con Exito");
+        } catch (Exception $e) {
+            DB::rollback();
+            Log::info($e);
+            return array("success" => false, "data" => null, "response" => $e->getMessage());
+        }
     }
 }

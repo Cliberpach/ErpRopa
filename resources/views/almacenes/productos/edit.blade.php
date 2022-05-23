@@ -1,7 +1,6 @@
 @extends('layout') @section('content')
 @section('almacenes-active', 'active')
 @section('producto-active', 'active')
-
 <div class="row wrapper border-bottom white-bg page-heading">
     <div class="col-lg-12">
         <h2 style="text-transform:uppercase"><b>MODIFICAR PRODUCTO TERMINADO</b></h2>
@@ -18,7 +17,6 @@
         </ol>
     </div>
 </div>
-
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
         <div class="col-lg-12">
@@ -184,10 +182,6 @@
                                         @endif
                                     </div>
                                 </div>
-
-
-
-
                             </div>
                             <div class="col-lg-6 col-xs-12">
                                 <h4><b>Tipos</b></h4>
@@ -205,6 +199,8 @@
                                         @endif
                                     </div> --}}
                                     <div class="form-group col-lg-6 col-xs-12">
+                                        <button class="btn btn-sm btn-primary" id="btn_categoria_modal_create"
+                                        type="button"><i class="fa fa-plus"></i></button>
                                         <label class="required">Tipo</label>
                                         <select id="categoria" name="categoria"
                                             value="{{ old('categoria', $producto->categoria_id) }}"
@@ -223,6 +219,8 @@
                                         @endif
                                     </div>
                                     <div class="form-group col-lg-6">
+                                        <button class="btn btn-sm btn-primary" id="btn_marca_modal_create"
+                                        type="button"><i class="fa fa-plus"></i></button>
                                         <label class="required">Marca</label>
                                         <select id="marca" name="marca"
                                             class="autocomplete-producto select2_form form-control {{ $errors->has('marca') ? ' is-invalid' : '' }}"
@@ -240,8 +238,6 @@
                                             </span>
                                         @endif
                                     </div>
-
-
                                 </div>
                                 <div class="form-group row d-none">
                                     <div class="col-lg-6 col-xs-12">
@@ -272,6 +268,8 @@
                                 </div>
                                 <div class="form-group row">
                                     <div class="form-group col-lg-6 col-xs-12">
+                                        <button class="btn btn-sm btn-primary" id="btn_modelo_modal_create"
+                                        type="button"><i class="fa fa-plus"></i></button>
                                         <label for="" class="required">Modelos</label>
                                         <select class="autocomplete-producto select2_form form-control"
                                             style="text-transform: uppercase; width:100%" name="modelo_id"
@@ -286,6 +284,8 @@
                                         </select>
                                     </div>
                                     <div class="form-group col-lg-6 col-xs-12">
+                                        <button class="btn btn-sm btn-primary" id="btn_tela_modal_create"
+                                        type="button"><i class="fa fa-plus"></i></button>
                                         <label for="" class="required">Telas</label>
                                         <select class="autocomplete-producto select2_form form-control"
                                             style="text-transform: uppercase; width:100%" name="tela_id" id="tela_id">
@@ -300,6 +300,8 @@
                                     </div>
                                     <div class="form-group col-lg-6 col-xs-12">
                                         <label for="" class="required">Colores</label>
+                                        <button class="btn btn-sm btn-primary" id="btn_color_modal_create"
+                                            type="button"><i class="fa fa-plus"></i></button>
                                         <select class="autocomplete-producto select2_form form-control"
                                             style="text-transform: uppercase; width:100%" name="color_id" id="color_id">
                                             <option></option>
@@ -312,6 +314,8 @@
                                         </select>
                                     </div>
                                     <div class="form-group col-lg-6 col-xs-12">
+                                        <button class="btn btn-sm btn-primary" id="btn_talla_modal_create"
+                                        type="button"><i class="fa fa-plus"></i></button>
                                         <label for="" class="required">Tallas</label>
                                         <select class="autocomplete-producto select2_form form-control"
                                             style="text-transform: uppercase; width:100%" name="talla_id" id="talla_id">
@@ -324,8 +328,9 @@
                                             @endforeach
                                         </select>
                                     </div>
-
                                     <div class="form-group col-lg-6 col-xs-12">
+                                        <button class="btn btn-sm btn-primary" id="btn_submodelo_modal_create"
+                                        type="button"><i class="fa fa-plus"></i></button>
                                         <label for="" class="required">SubModelos</label>
                                         <select class="autocomplete-producto select2_form form-control"
                                             style="text-transform: uppercase; width:100%" name="sub_modelo_id"
@@ -340,6 +345,8 @@
                                         </select>
                                     </div>
                                     <div class="form-group col-lg-6 col-xs-12">
+                                        <button class="btn btn-sm btn-primary" id="btn_temporada_modal_create"
+                                        type="button"><i class="fa fa-plus"></i></button>
                                         <label for="" class="required">Temporadas</label>
                                         <select class="autocomplete-producto select2_form form-control"
                                             style="text-transform: uppercase; width:100%" name="temporada_id"
@@ -354,6 +361,8 @@
                                         </select>
                                     </div>
                                     <div class="form-group col-lg-6 col-xs-12">
+                                        <button class="btn btn-sm btn-primary" id="btn_genero_modal_create"
+                                        type="button"><i class="fa fa-plus"></i></button>
                                         <label for="" class="required">Generos</label>
                                         <select class="autocomplete-producto select2_form form-control"
                                             style="text-transform: uppercase; width:100%" name="genero_id"
@@ -391,6 +400,8 @@
                                                 <thead>
                                                     <tr>
                                                         <th class="text-center">NOMBRE</th>
+                                                        <th class="text-center">CATEGORIA</th>
+                                                        <th class="text-center">MARCA</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -402,9 +413,7 @@
                             </div>
                         </div>
                         <hr>
-
                         <div class="row">
-
                             <div class="col-lg-12">
                                 <div class="panel panel-primary">
                                     <div class="panel-heading">
@@ -418,10 +427,7 @@
                                         </h4>
                                     </div>
                                     <div class="panel-body collapse" id="collapseExample">
-
-
                                         <div class="row">
-
                                             <div class="col-md-4">
                                                 <label class="required">Cliente</label>
                                                 <select class="select2_form form-control"
@@ -460,56 +466,34 @@
                                                             id="error-porcentaje"></span></b>
                                                 </div>
                                             </div>
-
                                             <div class="col-md-3">
                                                 <label class="">&nbsp;</label>
                                                 <a class="btn btn-block btn-warning enviar_cliente"
                                                     style='color:white;'> <i class="fa fa-plus"></i> AGREGAR</a>
                                             </div>
-
-
                                         </div>
                                         <input type="hidden" id="clientes_tabla" name="clientes_tabla[]">
-
                                         <hr>
-
                                         <div class="table-responsive">
                                             <table
                                                 class="table dataTables-clientes table-striped table-bordered table-hover"
                                                 style="text-transform:uppercase">
                                                 <thead>
                                                     <tr>
-
                                                         <th class="text-center">ACCIONES</th>
                                                         <th class="text-center">CLIENTE</th>
                                                         <th class="text-center">MONEDA</th>
                                                         <th class="text-center">PORCENTAJE</th>
-
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-
                                                 </tbody>
-
                                             </table>
                                         </div>
-
-
-
-
-
-
                                     </div>
                                 </div>
                             </div>
-
                         </div>
-
-
-
-
-
-
                         <div class="hr-line-dashed"></div>
                         <div class="row">
                             <div class="col-lg-12">
@@ -538,8 +522,17 @@
     </div>
 </div>
 @include('almacenes.productos.modal')
+{{-- Modals --}}
+@include('almacenes.productos.modals.modalCategoria');
+@include('almacenes.productos.modals.modalColor');
+@include('almacenes.productos.modals.modalGenero');
+@include('almacenes.productos.modals.modalMarca');
+@include('almacenes.productos.modals.modalModelo');
+@include('almacenes.productos.modals.modalSubModelo');
+@include('almacenes.productos.modals.modalTalla');
+@include('almacenes.productos.modals.modalTela');
+@include('almacenes.productos.modals.modalTemporada');
 @stop
-
 @push('styles')
 <link href="{{ asset('Inspinia/css/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css') }}"
     rel="stylesheet">
@@ -548,7 +541,6 @@
 <link href="{{ asset('Inspinia/css/plugins/select2/select2.min.css') }}" rel="stylesheet">
 <link href="{{ asset('Inspinia/css/plugins/dataTables/datatables.min.css') }}" rel="stylesheet">
 @endpush
-
 @push('scripts')
 <script src="{{ asset('Inspinia/js/plugins/iCheck/icheck.min.js') }}"></script>
 <script src="{{ asset('Inspinia/js/plugins/select2/select2.full.min.js') }}"></script>
@@ -563,7 +555,6 @@
         },
         buttonsStyling: false
     })
-
     $(document).ready(function() {
         $("#collapseAutoComplete").collapse("show")
         $(".select2_form").select2({
@@ -574,7 +565,6 @@
         });
         //Controlar Error
         $.fn.DataTable.ext.errMode = 'throw';
-
         $("#codigo").on("change", validarCodigo);
         $('#form_actualizar_producto').submit(function(e) {
             e.preventDefault();
@@ -606,15 +596,10 @@
                 }
             })
         });
-
         //OBTENER DATA DE EDITAR
         // var id = "{{ $producto->familia_id }}"
-
         // $.get('/almacenes/subcategoria/pt/getBySubFamilia/'+ id, function (data) {
-
-
         //     if(data.length > 0){
-
         //         var select = '<option value="" selected disabled >SELECCIONAR</option>'
         //         for (var i = 0; i < data.length; i++)
         //             if (data[i].id == "{{ $producto->sub_familia_id }}") {
@@ -622,21 +607,12 @@
         //             }else{
         //                 select += '<option value="' + data[i].id + '">' + data[i].descripcion+ '</option>';
         //             }
-
-
         //     }else{
         //         toastr.error('Sub Familias no registrados.','Error');
         //     }
-
         //     $("#sub_familia").html(select);
         //     $("#sub_familia").val("{{ $producto->sub_familia_id }}").trigger("change");
-
         // });
-
-
-
-
-
     });
 
     function validarCodigo() {
@@ -658,7 +634,6 @@
         });
     }
 </script>
-
 <script>
     var tableAutoComplete = null;
     $('#porcentaje').keyup(function() {
@@ -670,7 +645,6 @@
         }
         $(this).val(val);
     });
-
     $('#porcentaje_editar').keyup(function() {
         var val = $(this).val();
         if (isNaN(val)) {
@@ -680,7 +654,6 @@
         }
         $(this).val(val);
     });
-
     $(document).ready(function() {
         tableAutoComplete = $('#tableAutoComplete').DataTable({
             responsive: true,
@@ -692,9 +665,20 @@
             "serverSide": true,
             "ajax": route("almacenes.producto.autocomplete"),
             "columns": [{
-                data: 'nombre',
-                className: "text-left",
-            }, ]
+                    data: 'nombre',
+                    name: "p.nombre",
+                    className: "text-left",
+                }, {
+                    data: 'categoria',
+                    name: "c.descripcion",
+                    className: "text-left",
+                },
+                {
+                    data: 'marca',
+                    name: "m.marca",
+                    className: "text-left",
+                }
+            ]
         });
         autoComplete()
         // DataTables
@@ -708,7 +692,6 @@
             "language": {
                 "url": "{{ asset('Spanish.json') }}"
             },
-
             "columnDefs": [{
                     "targets": [0],
                     className: "text-center",
@@ -736,16 +719,10 @@
                     visible: false,
                     className: "text-center",
                 },
-
             ],
-
         });
-
         obtenerTabla()
-
     })
-
-
     //Editar Registro
     $(document).on('click', '#editar_cliente', function(event) {
         var table = $('.dataTables-clientes').DataTable();
@@ -756,10 +733,8 @@
         $('#porcentaje_editar').val(data[3]);
         $('#modal_editar_cliente').modal('show');
     })
-
     //Borrar registro de articulos
     $(document).on('click', '#borrar_cliente', function(event) {
-
         const swalWithBootstrapButtons = Swal.mixin({
             customClass: {
                 confirmButton: 'btn btn-success',
@@ -767,7 +742,6 @@
             },
             buttonsStyling: false
         })
-
         Swal.fire({
             title: 'Opción Eliminar',
             text: "¿Seguro que desea eliminar Artículo?",
@@ -781,7 +755,6 @@
                 var table = $('.dataTables-clientes').DataTable();
                 table.row($(this).parents('tr')).remove().draw();
                 // sumaTotal()
-
             } else if (
                 /* Read more about handling dismissals below */
                 result.dismiss === Swal.DismissReason.cancel
@@ -793,11 +766,7 @@
                 )
             }
         })
-
-
-
     });
-
     //Validacion al ingresar tablas
     $(".enviar_cliente").click(function() {
         limpiarErrores()
@@ -814,26 +783,18 @@
                 enviar = true;
             }
         }
-
         if ($('#porcentaje').val() == '') {
-
             toastr.error('Ingrese el porcentaje del tipo de cliente.', 'Error');
             enviar = true;
-
             $("#porcentaje").addClass("is-invalid");
             $('#error-porcentaje').text('El campo porcentaje es obligatorio.')
         }
-
         if ($('#moneda_cliente').val() == '') {
-
             toastr.error('Seleccione la moneda del tipo de cliente.', 'Error');
             enviar = true;
-
             $("#moneda_cliente").addClass("is-invalid");
             $('#error-moneda').text('El campo Moneda es obligatorio.')
         }
-
-
         if (enviar != true) {
             const swalWithBootstrapButtons = Swal.mixin({
                 customClass: {
@@ -842,7 +803,6 @@
                 },
                 buttonsStyling: false
             })
-
             Swal.fire({
                 title: 'Opción Agregar',
                 text: "¿Seguro que desea agregar Tipo de Cliente?",
@@ -853,7 +813,6 @@
                 cancelButtonText: "No, Cancelar",
             }).then((result) => {
                 if (result.isConfirmed) {
-
                     var detalle = {
                         cliente: $('#cliente').val(),
                         porcentaje: $('#porcentaje').val(),
@@ -862,7 +821,6 @@
                     }
                     limpiarDetalle()
                     agregarTabla(detalle);
-
                 } else if (
                     /* Read more about handling dismissals below */
                     result.dismiss === Swal.DismissReason.cancel
@@ -874,7 +832,6 @@
                     )
                 }
             })
-
         }
     })
 
@@ -898,29 +855,21 @@
             cargarMoneda(detalle.moneda),
             Number(detalle.porcentaje).toFixed(2),
             detalle.moneda,
-
         ]).draw(false);
-
         cargarClientes()
-
     }
 
     function cargarMoneda(id) {
-
         var moneda = ""
-
         @foreach (tipos_moneda() as $tipo_moneda)
             if ("{{ $tipo_moneda->id }}" == id) {
                 moneda = "{{ $tipo_moneda->descripcion }}"
             }
         @endforeach
-
         return moneda
-
     }
 
     function cargarClientes() {
-
         var clientes = [];
         var table = $('.dataTables-clientes').DataTable();
         var data = table.rows().data();
@@ -931,11 +880,8 @@
                 moneda: value[2],
                 id_moneda: value[4],
             };
-
             clientes.push(fila);
-
         });
-
         $('#clientes_tabla').val(JSON.stringify(clientes));
     }
 
@@ -943,16 +889,13 @@
         $('#porcentaje').val('')
         $('#cliente').val($('#cliente option:first-child').val()).trigger('change');
         $('#moneda_cliente').val($('#moneda_cliente option:first-child').val()).trigger('change');
-
     }
 
     function limpiarErrores() {
         $('#porcentaje').removeClass("is-invalid")
         $('#error-porcentaje').text('')
-
         $('#cliente').removeClass("is-invalid")
         $('#error-cliente').text('')
-
         $('#moneda_cliente').removeClass("is-invalid")
         $('#error-moneda').text('')
     }
@@ -966,11 +909,9 @@
                 cargarMoneda("{{ $cliente->moneda }}"),
                 "{{ $cliente->porcentaje }}",
                 "{{ $cliente->moneda }}",
-
             ]).draw(false);
         @endforeach
     }
-
     //CONSULTAR SI EXISTE EL CLIENTE TIPO CONSUMIDOR
     function buscarConsumidor() {
         var existe = false
@@ -996,6 +937,7 @@
     $(".autocomplete-producto").on('change', function() {
         autoComplete();
     });
+
     function autoComplete() {
         let marca_id = $("#marca").val();
         let categoria_id = $("#categoria").val();
@@ -1010,17 +952,19 @@
         descripcion = categoria_id == "" ? descripcion : descripcion + $.trim($("#categoria option:selected").text()) +
             " ";
         descripcion = marca_id == "" ? descripcion : descripcion + $.trim($("#marca option:selected").text()) + " ";
-        descripcion = modelo_id == "" ? descripcion : descripcion + $.trim($("#modelo_id option:selected").text()) + " ";
+        descripcion = modelo_id == "" ? descripcion : descripcion + $.trim($("#modelo_id option:selected").text()) +
+            " ";
         descripcion = tela_id == "" ? descripcion : descripcion + $.trim($("#tela_id option:selected").text()) + " ";
         descripcion = color_id == "" ? descripcion : descripcion + $.trim($("#color_id option:selected").text()) + " ";
         descripcion = talla_id == "" ? descripcion : descripcion + $.trim($("#talla_id option:selected").text()) + " ";
         descripcion = sub_modelo_id == "" ? descripcion : descripcion + $.trim($("#sub_modelo_id option:selected")
             .text()) + " ";
-        descripcion = temporada_id == "" ? descripcion : descripcion + $.trim($("#temporada_id option:selected").text()) +
+        descripcion = temporada_id == "" ? descripcion : descripcion + $.trim($("#temporada_id option:selected")
+                .text()) +
             " ";
-        descripcion = genero_id == "" ? descripcion : descripcion + $.trim($("#genero_id option:selected").text()) + " ";
-
-        $("#nombre").val(descripcion.substring(0, descripcion.length-1))
+        descripcion = genero_id == "" ? descripcion : descripcion + $.trim($("#genero_id option:selected").text()) +
+            " ";
+        $("#nombre").val(descripcion.substring(0, descripcion.length - 1))
         tableAutoComplete.ajax.url(route('almacenes.producto.autocomplete', {
             categoria_id: categoria_id == "" ? "null" : categoria_id,
             marca_id: marca_id == "" ? "null" : marca_id,
@@ -1034,5 +978,41 @@
             producto_id: '{{ $producto->id }}',
         })).load()
     }
+    $("#btn_categoria_modal_create").on('click', function() {
+        limpiarCategoria()
+        $("#modal_categoria").modal("show");
+    })
+    $("#btn_marca_modal_create").on('click', function() {
+        limpiarMarca()
+        $("#modal_marca").modal("show");
+    })
+    $("#btn_modelo_modal_create").on('click', function() {
+        limpiarModelo()
+        $("#modal_modelo").modal("show");
+    })
+    $("#btn_tela_modal_create").on('click', function() {
+        limpiarTela()
+        $("#modal_tela").modal("show");
+    })
+    $("#btn_color_modal_create").on('click', function() {
+        limpiarColor()
+        $("#modal_color").modal("show");
+    })
+    $("#btn_talla_modal_create").on('click', function() {
+        limpiarTalla()
+        $("#modal_talla").modal("show");
+    })
+    $("#btn_submodelo_modal_create").on('click', function() {
+        limpiarSubModelo()
+        $("#modal_submodelo").modal("show");
+    })
+    $("#btn_temporada_modal_create").on('click', function() {
+        limpiarTemporada()
+        $("#modal_temporada").modal("show");
+    })
+    $("#btn_genero_modal_create").on('click', function() {
+        limpiarGenero()
+        $("#modal_genero").modal("show");
+    })
 </script>
 @endpush
