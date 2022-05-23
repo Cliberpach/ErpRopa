@@ -208,12 +208,12 @@ class ProductoController extends Controller
             $producto->igv = $request->get('igv');
 
             $producto->color_id = $request->color_id;
-            $producto->modelo_id=$request->modelo_id;
-            $producto->tela_id=$request->tela_id;
-            $producto->talla_id=$request->talla_id;
-            $producto->sub_modelo_id=$request->sub_modelo_id;
-            $producto->temporada_id=$request->temporada_id;
-            $producto->genero_id=$request->genero_id;
+            $producto->modelo_id = $request->modelo_id;
+            $producto->tela_id = $request->tela_id;
+            $producto->talla_id = $request->talla_id;
+            $producto->sub_modelo_id = $request->sub_modelo_id;
+            $producto->temporada_id = $request->temporada_id;
+            $producto->genero_id = $request->genero_id;
 
             $producto->save();
 
@@ -332,12 +332,12 @@ class ProductoController extends Controller
         $producto->peso_producto = $request->get('peso_producto');
         $producto->codigo_barra = $request->get('codigo_barra');
         $producto->color_id = $request->color_id;
-        $producto->modelo_id=$request->modelo_id;
-        $producto->tela_id=$request->tela_id;
-        $producto->talla_id=$request->talla_id;
-        $producto->sub_modelo_id=$request->sub_modelo_id;
-        $producto->temporada_id=$request->temporada_id;
-        $producto->genero_id=$request->genero_id;
+        $producto->modelo_id = $request->modelo_id;
+        $producto->tela_id = $request->tela_id;
+        $producto->talla_id = $request->talla_id;
+        $producto->sub_modelo_id = $request->sub_modelo_id;
+        $producto->temporada_id = $request->temporada_id;
+        $producto->genero_id = $request->genero_id;
         $producto->update();
 
         if ($request->get('codigo_barra')) {
@@ -536,7 +536,7 @@ class ProductoController extends Controller
         $genero_id = null,
         $producto_id = null
     ) {
-        $consulta = DB::table('productos as p')->where('p.estado', 'ACTIVO');
+        $consulta = DB::table('productos as p')->join('categorias as c', 'c.id', '=', 'p.categoria_id')->join('marcas as m', 'm.id', '=', 'p.marca_id')->where('p.estado', 'ACTIVO');
         $consulta = $producto_id == "null" || $producto_id == null ? $consulta : $consulta->where('p.id', '!=', $producto_id);
         $consulta = $categoria_id == "null" || $categoria_id == null ? $consulta : $consulta->where('p.categoria_id', $categoria_id);
         $consulta = $marca_id == "null" || $marca_id == null ? $consulta : $consulta->where('p.marca_id', $marca_id);
@@ -547,6 +547,6 @@ class ProductoController extends Controller
         $consulta = $sub_modelo_id == "null" || $sub_modelo_id == null ? $consulta : $consulta->where('p.sub_modelo_id', $sub_modelo_id);
         $consulta = $temporada_id == "null" || $temporada_id == null ? $consulta : $consulta->where('p.temporada_id', $temporada_id);
         $consulta = $genero_id == "null" || $genero_id == null ? $consulta : $consulta->where('p.genero_id', $genero_id);
-        return datatables()->query($consulta->select('p.nombre'))->toJson();
+        return datatables()->query($consulta->select('p.nombre','c.descripcion','m.marca'))->toJson();
     }
 }

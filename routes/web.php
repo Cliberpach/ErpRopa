@@ -179,6 +179,8 @@ Route::group(
             Route::get('destroy/{id}', 'Almacenes\CategoriaController@destroy')->name('almacenes.categorias.destroy');
             Route::post('store', 'Almacenes\CategoriaController@store')->name('almacenes.categorias.store');
             Route::put('update', 'Almacenes\CategoriaController@update')->name('almacenes.categorias.update');
+            Route::post('storeApi', 'Almacenes\CategoriaController@storeApi')->name('almacenes.categoria.storeApi');
+            Route::post('/exist', 'Almacenes\CategoriaController@exist')->name('almacenes.categoria.exist');
         });
         //Marcas
         Route::prefix('almacenes/marcas')->group(function () {
@@ -188,6 +190,7 @@ Route::group(
             Route::post('store', 'Almacenes\MarcaController@store')->name('almacenes.marcas.store');
             Route::put('update', 'Almacenes\MarcaController@update')->name('almacenes.marcas.update');
             Route::post('/exist', 'Almacenes\MarcaController@exist')->name('almacenes.marcas.exist');
+            Route::post('storeApi', 'Almacenes\MarcaController@storeApi')->name('almacenes.marcas.storeApi');
         });
         //Productos
         Route::prefix('almacenes/productos')->group(function () {
@@ -222,6 +225,7 @@ Route::group(
             Route::post('store', 'Almacenes\ColorController@store')->name('almacenes.color.store');
             Route::put('update', 'Almacenes\ColorController@update')->name('almacenes.color.update');
             Route::post('/exist', 'Almacenes\ColorController@exist')->name('almacenes.color.exist');
+            Route::post('storeApi', 'Almacenes\ColorController@storeApi')->name('almacenes.color.storeApi');
         });
         //Modelos
         Route::prefix('almacenes/modelo')->group(function () {
@@ -231,6 +235,7 @@ Route::group(
             Route::post('store', 'Almacenes\ModeloController@store')->name('almacenes.modelo.store');
             Route::put('update', 'Almacenes\ModeloController@update')->name('almacenes.modelo.update');
             Route::post('/exist', 'Almacenes\ModeloController@exist')->name('almacenes.modelo.exist');
+            Route::post('storeApi', 'Almacenes\ModeloController@storeApi')->name('almacenes.modelo.storeApi');
         });
         //Tallas
         Route::prefix('almacenes/talla')->group(function () {
@@ -240,6 +245,7 @@ Route::group(
             Route::post('store', 'Almacenes\TallaController@store')->name('almacenes.talla.store');
             Route::put('update', 'Almacenes\TallaController@update')->name('almacenes.talla.update');
             Route::post('/exist', 'Almacenes\TallaController@exist')->name('almacenes.talla.exist');
+            Route::post('storeApi', 'Almacenes\TallaController@storeApi')->name('almacenes.talla.storeApi');
         });
         //Telas
         Route::prefix('almacenes/tela')->group(function () {
@@ -249,6 +255,7 @@ Route::group(
             Route::post('store', 'Almacenes\TelaController@store')->name('almacenes.tela.store');
             Route::put('update', 'Almacenes\TelaController@update')->name('almacenes.tela.update');
             Route::post('/exist', 'Almacenes\TelaController@exist')->name('almacenes.tela.exist');
+            Route::post('storeApi', 'Almacenes\TelaController@storeApi')->name('almacenes.tela.storeApi');
         });
         //Sub Modelo
         Route::prefix('almacenes/subModelo')->group(function () {
@@ -258,6 +265,7 @@ Route::group(
             Route::post('store', 'Almacenes\SubModeloController@store')->name('almacenes.submodelo.store');
             Route::put('update', 'Almacenes\SubModeloController@update')->name('almacenes.submodelo.update');
             Route::post('/exist', 'Almacenes\SubModeloController@exist')->name('almacenes.submodelo.exist');
+            Route::post('storeApi', 'Almacenes\SubModeloController@storeApi')->name('almacenes.submodelo.storeApi');
         });
         //Temporada
         Route::prefix('almacenes/temporada')->group(function () {
@@ -266,6 +274,7 @@ Route::group(
             Route::get('destroy/{id}', 'Almacenes\TemporadaController@destroy')->name('almacenes.temporada.destroy');
             Route::post('store', 'Almacenes\TemporadaController@store')->name('almacenes.temporada.store');
             Route::put('update', 'Almacenes\TemporadaController@update')->name('almacenes.temporada.update');
+            Route::post('storeApi', 'Almacenes\TemporadaController@storeApi')->name('almacenes.temporada.storeApi');
             Route::post('/exist', 'Almacenes\TemporadaController@exist')->name('almacenes.temporada.exist');
         });
         //Genero
@@ -276,6 +285,8 @@ Route::group(
             Route::post('store', 'Almacenes\GeneroController@store')->name('almacenes.genero.store');
             Route::put('update', 'Almacenes\GeneroController@update')->name('almacenes.genero.update');
             Route::post('/exist', 'Almacenes\GeneroController@exist')->name('almacenes.genero.exist');
+            Route::post('storeApi', 'Almacenes\GeneroController@storeApi')->name('almacenes.genero.storeApi');
+
         });
         //NotaIngreso
         Route::prefix('almacenes/nota_ingreso')->group(function () {
@@ -811,7 +822,7 @@ Route::get('/buscar', 'BuscarController@index');
 Route::post('/getDocument', 'BuscarController@getDocumento')->name('buscar.getDocument');
 
 Route::get('ruta', function () {
-    $productos = Producto::where('id','>',70000)->get();
+    $productos = Producto::where('id', '>', 70000)->get();
     foreach ($productos as $producto) {
         TipoCliente::create([
             'cliente' => '121',

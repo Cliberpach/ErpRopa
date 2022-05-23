@@ -148,7 +148,6 @@
                                             </label>
                                         </div>
                                     </div>
-
                                     <div class="col-lg-6 col-12">
                                         <div class="form-group">
                                             <label class="required">Almacén</label>
@@ -187,6 +186,8 @@
                                         @endif
                                     </div> --}}
                                     <div class="form-group col-lg-6 col-12">
+                                        <button class="btn btn-sm btn-primary" id="btn_categoria_modal_create"
+                                            type="button"><i class="fa fa-plus"></i></button>
                                         <label class="required">Tipo</label>
                                         <select id="categoria" name="categoria"
                                             class="autocomplete-producto select2_form form-control {{ $errors->has('familia') ? ' is-invalid' : '' }}">
@@ -203,8 +204,9 @@
                                             </span>
                                         @endif
                                     </div>
-
                                     <div class="form-group col-lg-6">
+                                        <button class="btn btn-sm btn-primary" id="btn_marca_modal_create"
+                                            type="button"><i class="fa fa-plus"></i></button>
                                         <label class="required">Marca</label>
                                         <select id="marca" name="marca"
                                             class="autocomplete-producto select2_form form-control {{ $errors->has('marca') ? ' is-invalid' : '' }}"
@@ -252,6 +254,8 @@
                                 </div>
                                 <div class="form-group row">
                                     <div class="form-group col-lg-6 col-xs-12">
+                                        <button class="btn btn-sm btn-primary" id="btn_modelo_modal_create"
+                                            type="button"><i class="fa fa-plus"></i></button>
                                         <label for="" class="required">Modelos</label>
                                         <select class="autocomplete-producto select2_form form-control"
                                             style="text-transform: uppercase; width:100%" name="modelo_id"
@@ -264,8 +268,9 @@
                                             @endforeach
                                         </select>
                                     </div>
-
                                     <div class="form-group col-lg-6 col-xs-12">
+                                        <button class="btn btn-sm btn-primary" id="btn_tela_modal_create"
+                                            type="button"><i class="fa fa-plus"></i></button>
                                         <label for="" class="required">Telas</label>
                                         <select class="autocomplete-producto select2_form form-control"
                                             style="text-transform: uppercase; width:100%" name="tela_id" id="tela_id">
@@ -278,6 +283,8 @@
                                         </select>
                                     </div>
                                     <div class="form-group col-lg-6 col-xs-12">
+                                        <button class="btn btn-sm btn-primary" id="btn_color_modal_create"
+                                            type="button"><i class="fa fa-plus"></i></button>
                                         <label for="" class="required">Colores</label>
                                         <select class="autocomplete-producto select2_form form-control"
                                             style="text-transform: uppercase; width:100%" name="color_id" id="color_id">
@@ -289,8 +296,9 @@
                                             @endforeach
                                         </select>
                                     </div>
-
                                     <div class="form-group col-lg-6 col-xs-12">
+                                        <button class="btn btn-sm btn-primary" id="btn_talla_modal_create"
+                                            type="button"><i class="fa fa-plus"></i></button>
                                         <label for="" class="required">Tallas</label>
                                         <select class="autocomplete-producto select2_form form-control"
                                             style="text-transform: uppercase; width:100%" name="talla_id" id="talla_id">
@@ -303,6 +311,8 @@
                                         </select>
                                     </div>
                                     <div class="form-group col-lg-6 col-xs-12">
+                                        <button class="btn btn-sm btn-primary" id="btn_submodelo_modal_create"
+                                            type="button"><i class="fa fa-plus"></i></button>
                                         <label for="" class="required">SubModelos</label>
                                         <select class="autocomplete-producto select2_form form-control"
                                             style="text-transform: uppercase; width:100%" name="sub_modelo_id"
@@ -316,6 +326,8 @@
                                         </select>
                                     </div>
                                     <div class="form-group col-lg-6 col-xs-12">
+                                        <button class="btn btn-sm btn-primary" id="btn_temporada_modal_create"
+                                            type="button"><i class="fa fa-plus"></i></button>
                                         <label for="" class="required">Temporadas</label>
                                         <select class="autocomplete-producto select2_form form-control"
                                             style="text-transform: uppercase; width:100%" name="temporada_id"
@@ -329,6 +341,8 @@
                                         </select>
                                     </div>
                                     <div class="form-group col-lg-6 col-xs-12">
+                                        <button class="btn btn-sm btn-primary" id="btn_genero_modal_create"
+                                            type="button"><i class="fa fa-plus"></i></button>
                                         <label for="" class="required">Generos</label>
                                         <select class="autocomplete-producto select2_form form-control"
                                             style="text-transform: uppercase; width:100%" name="genero_id"
@@ -365,6 +379,8 @@
                                                 <thead>
                                                     <tr>
                                                         <th class="text-center">NOMBRE</th>
+                                                        <th class="text-center">CATEGORIA</th>
+                                                        <th class="text-center">MARCA</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -485,6 +501,16 @@
     </div>
 </div>
 @include('almacenes.productos.modal')
+{{-- Modals --}}
+@include('almacenes.productos.modals.modalCategoria');
+@include('almacenes.productos.modals.modalColor');
+@include('almacenes.productos.modals.modalGenero');
+@include('almacenes.productos.modals.modalMarca');
+@include('almacenes.productos.modals.modalModelo');
+@include('almacenes.productos.modals.modalSubModelo');
+@include('almacenes.productos.modals.modalTalla');
+@include('almacenes.productos.modals.modalTela');
+@include('almacenes.productos.modals.modalTemporada');
 @stop
 @push('styles')
 <link href="{{ asset('Inspinia/css/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css') }}"
@@ -612,9 +638,21 @@
             "serverSide": true,
             "ajax": route("almacenes.producto.autocomplete"),
             "columns": [{
-                data: 'nombre',
-                className: "text-left",
-            }, ]
+                    data: 'nombre',
+                    name: "p.nombre",
+                    className: "text-left",
+                },
+                {
+                    data: 'descripcion',
+                    name: "c.descripcion",
+                    className: "text-left",
+                },
+                {
+                    data: 'marca',
+                    name: "m.marca",
+                    className: "text-left",
+                }
+            ]
         });
         $('.dataTables-clientes').DataTable({
             "dom": 'lTfgitp',
@@ -869,17 +907,19 @@
         descripcion = categoria_id == "" ? descripcion : descripcion + $.trim($("#categoria option:selected").text()) +
             " ";
         descripcion = marca_id == "" ? descripcion : descripcion + $.trim($("#marca option:selected").text()) + " ";
-        descripcion = modelo_id == "" ? descripcion : descripcion + $.trim($("#modelo_id option:selected").text()) + " ";
+        descripcion = modelo_id == "" ? descripcion : descripcion + $.trim($("#modelo_id option:selected").text()) +
+            " ";
         descripcion = tela_id == "" ? descripcion : descripcion + $.trim($("#tela_id option:selected").text()) + " ";
         descripcion = color_id == "" ? descripcion : descripcion + $.trim($("#color_id option:selected").text()) + " ";
         descripcion = talla_id == "" ? descripcion : descripcion + $.trim($("#talla_id option:selected").text()) + " ";
         descripcion = sub_modelo_id == "" ? descripcion : descripcion + $.trim($("#sub_modelo_id option:selected")
             .text()) + " ";
-        descripcion = temporada_id == "" ? descripcion : descripcion + $.trim($("#temporada_id option:selected").text()) +
+        descripcion = temporada_id == "" ? descripcion : descripcion + $.trim($("#temporada_id option:selected")
+                .text()) +
             " ";
-        descripcion = genero_id == "" ? descripcion : descripcion + $.trim($("#genero_id option:selected").text()) + " ";
-
-        $("#nombre").val(descripcion.substring(0, descripcion.length-1))
+        descripcion = genero_id == "" ? descripcion : descripcion + $.trim($("#genero_id option:selected").text()) +
+            " ";
+        $("#nombre").val(descripcion.substring(0, descripcion.length - 1))
         tableAutoComplete.ajax.url(route('almacenes.producto.autocomplete', {
             categoria_id: categoria_id == "" ? "null" : categoria_id,
             marca_id: marca_id == "" ? "null" : marca_id,
@@ -893,5 +933,41 @@
             producto_id: "null",
         })).load()
     }
+    $("#btn_categoria_modal_create").on('click', function() {
+        limpiarCategoria()
+        $("#modal_categoria").modal("show");
+    })
+    $("#btn_marca_modal_create").on('click', function() {
+        limpiarMarca()
+        $("#modal_marca").modal("show");
+    })
+    $("#btn_modelo_modal_create").on('click', function() {
+        limpiarModelo()
+        $("#modal_modelo").modal("show");
+    })
+    $("#btn_tela_modal_create").on('click', function() {
+        limpiarTela()
+        $("#modal_tela").modal("show");
+    })
+    $("#btn_color_modal_create").on('click', function() {
+        limpiarColor()
+        $("#modal_color").modal("show");
+    })
+    $("#btn_talla_modal_create").on('click', function() {
+        limpiarTalla()
+        $("#modal_talla").modal("show");
+    })
+    $("#btn_submodelo_modal_create").on('click', function() {
+        limpiarSubModelo()
+        $("#modal_submodelo").modal("show");
+    })
+    $("#btn_temporada_modal_create").on('click', function() {
+        limpiarTemporada()
+        $("#modal_temporada").modal("show");
+    })
+    $("#btn_genero_modal_create").on('click', function() {
+        limpiarGenero()
+        $("#modal_genero").modal("show");
+    })
 </script>
 @endpush
