@@ -142,7 +142,6 @@ class DocumentoController extends Controller
         }
         $empresas = Empresa::where('estado','ACTIVO')->get();
         $proveedores = Proveedor::where('estado','ACTIVO')->get();
-        $productos = Producto::where('estado','ACTIVO')->get();
         $modos =  modo_compra();
         $condiciones = Condicion::where('estado','ACTIVO')->get();
 
@@ -151,7 +150,6 @@ class DocumentoController extends Controller
             return view('compras.documentos.create',[
                 'empresas' => $empresas,
                 'proveedores' => $proveedores,
-                'productos' => $productos,
                 'modos' => $modos,
                 'monedas' => $monedas,
                 'fecha_hoy' => $fecha_hoy,
@@ -164,7 +162,6 @@ class DocumentoController extends Controller
                 'orden' => $orden,
                 'empresas' => $empresas,
                 'proveedores' => $proveedores,
-                'productos' => $productos,
                 'modos' => $modos,
                 'monedas' => $monedas,
                 'fecha_hoy' => $fecha_hoy,
@@ -388,7 +385,6 @@ class DocumentoController extends Controller
         $detalles = DocumentoDetalle::where('documento_id', $id)->where('estado','ACTIVO')->get();
         $proveedores = Proveedor::where('estado','ACTIVO')->get();
         $documento = Documento::findOrFail($id);
-        $productos = producto::where('estado','ACTIVO')->get();
         $presentaciones =  presentaciones();
         $fecha_hoy = Carbon::now()->toDateString();
         $fecha_actual = Carbon::now();
@@ -399,7 +395,6 @@ class DocumentoController extends Controller
             'empresas' => $empresas,
             'proveedores' => $proveedores,
             'documento' => $documento,
-            'productos' => $productos,
             'presentaciones' => $presentaciones,
             'fecha_hoy' => $fecha_hoy,
             'fecha_actual' => $fecha_actual,

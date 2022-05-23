@@ -340,18 +340,13 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-lg-6 col-xs-12 b-r">
-                                            <div class="form-group row align-items-end">
-                                                <div class="col-10 col-md-10">
-                                                    <label class="required">Producto:</label>
-                                                    <select class="select2_form form-control"
-                                                        style="text-transform: uppercase; width:100%" name="producto_id"
-                                                        id="producto_id">
-                                                    </select>
-                                                    <div class="invalid-feedback"><b><span id="error-producto"></span></b>
-                                                    </div>
-                                                </div>
-                                                <div class="col-2 col-md-2">
-                                                    <button type="button" class="btn btn-secondary" onclick="obtenerProducts()"><i class="fa fa-refresh"></i></button>
+                                            <div class="form-group">
+                                                <label class="required">Producto:</label>
+                                                <select class="select2_form form-control"
+                                                    style="text-transform: uppercase; width:100%" name="producto_id"
+                                                    id="producto_id">
+                                                </select>
+                                                <div class="invalid-feedback"><b><span id="error-producto"></span></b>
                                                 </div>
                                             </div>
 
@@ -565,7 +560,78 @@ $(document).ready(function() {
         $("#campo_tipo_cambio").addClass("required")
     }
 
-    obtenerProducts();
+    $('#producto_id').select2({
+        ajax: {
+            url: route('getProductosSelect'),
+            dataType: 'json',
+            type: 'get',
+            delay: 250,
+            data: function (params) {
+                var query = {
+                    search: params.term,
+                    page: params.page || 1
+                }
+
+                // Query parameters will be ?search=[term]&page=[page]
+                return query;
+            },
+            processResults: function (data, params) {
+                params.page = params.page || 1;
+                return {
+                    results: data.data,
+                    pagination: {
+                        more: data.total
+                    }
+                };
+            },
+            cache: true
+        },
+        placeholder: 'Buscar producto',
+        minimumInputLength: 3,
+        language: {
+
+            errorLoading: function () {
+                return 'No se pudo cargar el resultado.';
+            },
+            inputTooLong: function (args) {
+                var overChars = args.input.length - args.maximum;
+                var message = 'Por favor borrar ' + overChars + ' caracteres';
+                if (overChars >= 2 && overChars <= 4) {
+                    message += 'а';
+                } else if (overChars >= 5) {
+                    message += 'ов';
+                }
+                return message;
+            },
+            inputTooShort: function (args) {
+                var remainingChars = args.minimum - args.input.length;
+
+                var message = 'Por favor ingrese ' + remainingChars + ' o mas caracteres';
+
+                return message;
+            },
+            loadingMore: function () {
+                return 'Cargando más recursos...';
+            },
+            maximumSelected: function (args) {
+                var message = 'Puedes elegir ' + args.maximum + ' articulos';
+
+                if (args.maximum  >= 2 && args.maximum <= 4) {
+                    message += 'а';
+                } else if (args.maximum >= 5) {
+                    message += 'ов';
+                }
+
+                return message;
+            },
+            noResults: function () {
+            return 'No hay resultados';
+            },
+            searching: function () {
+            return 'Buscando…';
+            }
+        }
+    });
 
 })
 
@@ -966,6 +1032,7 @@ $(document).on('click', '#editar_producto', function(event) {
     var data = table.row($(this).parents('tr')).data();
     $('#indice').val(table.row($(this).parents('tr')).index());
     $('#producto_id_editar').val(data[0]).trigger('change');
+    $('#producto_editar').val(data[3]).trigger('change');
     $('#precio_editar').val(data[6]);
     $('#costo_flete_editar').val(data[5]);
     $('#fecha_vencimiento_editar').val(data[4]);
@@ -1028,17 +1095,17 @@ $(document).on('click', '#borrar_producto', function(event) {
 $(".enviar_producto").click(function() {
     limpiarErrores()
     var enviar = true;
-    if ($('#producto_id').val() == '') {
-        toastr.error('Seleccione Producto.', 'Error');
-        enviar = false;
-        $('#producto_id').addClass("is-invalid")
-        $('#error-producto').text('El campo Producto es obligatorio.')
-    } else {
+    if ($('#producto_id').val()) {
         var existe = buscarproducto($('#producto_id').val())
         if (existe == true) {
             toastr.error('Producto ya se encuentra ingresado.', 'Error');
             enviar = false;
         }
+    } else {
+        toastr.error('Seleccione Producto.', 'Error');
+        enviar = false;
+        $('#producto_id').addClass("is-invalid")
+        $('#error-producto').text('El campo Producto es obligatorio.')
     }
     if ($('#precio').val() == '') {
 
@@ -1171,7 +1238,7 @@ function limpiarDetalle() {
     $('#precio').val('')
     $('#cantidad').val('')
     $('#costo_flete').val('')
-    $('#producto_id').val($('#producto_id option:first-child').val()).trigger('change');
+    $('#producto_id').val('').trigger('change');
     $('#lote').val('')
     $('#fecha_vencimiento').val('')
 }
@@ -1233,16 +1300,6 @@ $("#moneda").on("change", function() {
         $("#campo_tipo_cambio").addClass("required")
     }
 });
-
-function productoPresentacion(producto) {
-    var presentacion = ""
-    @foreach($productos as $producto)
-    if ("{{$producto->id}}" == producto) {
-        presentacion = "{{$producto->presentacion}}"
-    }
-    @endforeach
-    return presentacion
-}
 
 
 function agregarTabla($detalle) {
@@ -1414,32 +1471,6 @@ function sumaTotal() {
             $("#proveedor_razon").select2('val',id);
         }
     });
-
-    function obtenerProducts()
-    {
-        $('#panel_detalle').children('.ibox-content').toggleClass('sk-loading');
-        $("#producto_id").empty().trigger('change');
-        axios.get('{{ route('compras.documento.getProduct') }}').then(response => {
-            let data = response.data.data
-            console.log(data)
-            if (data.length > 0) {
-                $('#producto_id').append('<option></option>').trigger('change');
-                for(var i = 0;i < data.length; i++)
-                {
-                    let codigo = data[i].codigo_barra ? (' - ' + data[i].codigo_barra) : '';
-                    var newOption = '<option value="'+data[i].id+'" peso="'+data[i].peso_producto+'" unidad="'+data[i].medida_desc+'" descripcion="'+data[i].nombre+'">'+data[i].nombre + codigo + '</option>';
-                    $('#producto_id').append(newOption).trigger('change');
-                    //departamentos += '<option value="'+result.departamentos[i].id+'">'+result.departamentos[i].nombre+'</option>';
-                }
-
-                $('#panel_detalle').children('.ibox-content').toggleClass('sk-loading');
-
-            } else {
-                $('#panel_detalle').children('.ibox-content').toggleClass('sk-loading');
-                toastr.error('Productos no encontrados.', 'Error');
-            }
-        })
-    }
 
     function nextFocus(event, inputS) {
         if (event.keyCode == 13) {

@@ -137,12 +137,9 @@
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label class="col-form-label">Producto</label>
-                                            <select name="producto" id="producto" class="form-control select2_form">
-                                                <option value=""></option>
-                                                @foreach ($productos as $producto)
-                                                    <option  value="{{$producto->id}}" id="{{$producto->id}}">{{$producto->nombre}}</option>
-                                                @endforeach
-                                            </select>
+                                                <select name="producto" id="producto" class="form-control select2_form">
+                                                    <option value=""></option>
+                                                </select>
                                             </div>
                                         </div>
                                         <div class="col-md-2">
@@ -473,7 +470,8 @@ $(document).on('click', '.btn-edit', function(event) {
     $('#modal_editar_detalle #detalle_id').val(data[8]);
     $('#modal_editar_detalle #fechavencimiento').val(data[5]);
     $('#modal_editar_detalle').modal('show');
-    $("#modal_editar_detalle #producto").val(data[0]).trigger('change');
+    $("#modal_editar_detalle #producto").val(data[0]);
+    $("#modal_editar_detalle #producto_descripcion").val(data[4]);
 });
 
 function agregarTabla($detalle) {

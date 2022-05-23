@@ -155,7 +155,6 @@ class OrdenController extends Controller
             $aviso = $documento->id;
         }
 
-        $productos = Producto::where('estado','ACTIVO')->get();
         $presentaciones =  presentaciones();
         $modos =  modo_compra();
         $monedas =  tipos_moneda();
@@ -166,7 +165,6 @@ class OrdenController extends Controller
                 'empresas' => $empresas,
                 'proveedores' => $proveedores,
                 'orden' => $orden,
-                'productos' => $productos,
                 'presentaciones' => $presentaciones,
                 'condiciones' => $condiciones,
                 'fecha_hoy' => $fecha_hoy,
@@ -180,7 +178,6 @@ class OrdenController extends Controller
                 'empresas' => $empresas,
                 'proveedores' => $proveedores,
                 'orden' => $orden,
-                'productos' => $productos,
                 'presentaciones' => $presentaciones,
                 'condiciones' => $condiciones,
                 'fecha_hoy' => $fecha_hoy,
