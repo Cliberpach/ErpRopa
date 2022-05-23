@@ -22,14 +22,8 @@
 
                                 <div class="form-group">
                                     <label class="">Producto</label>
-                                    <select class="select2_form form-control" style="text-transform: uppercase; width:100%"
-                                        name="producto_editar_id" id="producto_id_editar" disabled>
-                                        <option></option>
-                                        @foreach ($productos as $producto)
-                                        <option value="{{$producto->id}}">{{$producto->nombre}}
-                                        </option>
-                                        @endforeach
-                                    </select>
+                                    <input type="hidden" id="producto_id_editar" class="form-control" disabled>
+                                    <input type="text" id="producto_editar" class="form-control" disabled>
                                     <div class="invalid-feedback"><b><span id="error-producto_id_editar"></span></b></div>
 
                                 </div>
@@ -90,14 +84,8 @@
 
                             <div class="form-group">
                                 <label class="">Producto</label>
-                                <select class="select2_form form-control" style="text-transform: uppercase; width:100%"
-                                    name="producto_editar_id" id="producto_id_editar" disabled>
-                                    <option></option>
-                                    @foreach ($productos as $producto)
-                                    <option value="{{$producto->id}}">{{$producto->nombre}}
-                                    </option>
-                                    @endforeach
-                                </select>
+                                <input type="hidden" id="producto_id_editar" class="form-control" disabled>
+                                <input type="text" id="producto_editar" class="form-control" disabled>
                                 <div class="invalid-feedback"><b><span id="error-producto_id_editar"></span></b></div>
 
                             </div>

@@ -115,13 +115,25 @@ class ProductoController extends Controller
 
     public function getProductosSelect(Request $request)
     {
-        return DB::table('productos')
-        ->join('categorias', 'categorias.id', '=', 'productos.categoria_id')
-        ->join('marcas', 'productos.marca_id', '=', 'marcas.id')
-        ->join('almacenes', 'almacenes.id', '=', 'productos.almacen_id')
-        ->select('categorias.descripcion as categoria', 'almacenes.descripcion as almacen', 'marcas.marca', 'productos.*')
-        ->orderBy('productos.id', 'DESC')
-        ->where('productos.estado', 'ACTIVO')->get();
+        $sBuscar = $request->get('search');
+        $perPage = 10;
+
+        $lstBuscar = explode(' ', $sBuscar, 3);
+
+        $sBusqueda0 = '%' . $lstBuscar[0] . '%';
+        $lstProductos_aux = DB::table('productos')->where('nombre', 'like', $sBusqueda0);
+
+        if (count($lstBuscar) > 1) {
+            foreach ($lstBuscar as $i => $sBuscando) {
+                if (strlen(trim($sBuscando)) > 2 && $i > 0) {
+                    $sBusqueda = '%' . $sBuscando . '%';
+                    $lstProductos_aux = $lstProductos_aux->orWhere('nombre', 'like', $sBusqueda);
+                }
+            }
+        }
+
+        $results = $lstProductos_aux->select('productos.id', 'productos.nombre as text')->paginate($perPage);
+        return response()->json($results);
     }
 
     public function create()

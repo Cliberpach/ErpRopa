@@ -139,12 +139,9 @@
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label class="col-form-label">Producto</label>
-                                            <select name="producto" id="producto" class="form-control select2_form">
-                                                <option value=""></option>
-                                                @foreach ($productos as $producto)
-                                                    <option  value="{{$producto->id}}" id="{{$producto->id}}">{{$producto->nombre}}</option>
-                                                @endforeach
-                                            </select>
+                                                <select name="producto" id="producto" class="form-control select2_form">
+                                                    <option value=""></option>
+                                                </select>
                                             </div>
                                         </div>
                                         <div class="col-md-2">
@@ -418,6 +415,79 @@
 
         });
 
+        $('#producto').select2({
+            ajax: {
+                url: route('getProductosSelect'),
+                dataType: 'json',
+                type: 'get',
+                delay: 250,
+                data: function (params) {
+                    var query = {
+                        search: params.term,
+                        page: params.page || 1
+                    }
+
+                    // Query parameters will be ?search=[term]&page=[page]
+                    return query;
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.data,
+                        pagination: {
+                            more: data.total
+                        }
+                    };
+                },
+                cache: true
+            },
+            placeholder: 'Buscar producto',
+            minimumInputLength: 3,
+            language: {
+
+                errorLoading: function () {
+                    return 'No se pudo cargar el resultado.';
+                },
+                inputTooLong: function (args) {
+                    var overChars = args.input.length - args.maximum;
+                    var message = 'Por favor borrar ' + overChars + ' caracteres';
+                    if (overChars >= 2 && overChars <= 4) {
+                        message += 'а';
+                    } else if (overChars >= 5) {
+                        message += 'ов';
+                    }
+                    return message;
+                },
+                inputTooShort: function (args) {
+                    var remainingChars = args.minimum - args.input.length;
+
+                    var message = 'Por favor ingrese ' + remainingChars + ' o mas caracteres';
+
+                    return message;
+                },
+                loadingMore: function () {
+                    return 'Cargando más recursos...';
+                },
+                maximumSelected: function (args) {
+                    var message = 'Puedes elegir ' + args.maximum + ' articulos';
+
+                    if (args.maximum  >= 2 && args.maximum <= 4) {
+                        message += 'а';
+                    } else if (args.maximum >= 5) {
+                        message += 'ов';
+                    }
+
+                    return message;
+                },
+                noResults: function () {
+                return 'No hay resultados';
+                },
+                searching: function () {
+                return 'Buscando…';
+                }
+            }
+        });
+
     })
 
     //Borrar registro de articulos
@@ -558,7 +628,8 @@
         $('#modal_editar_detalle #prod_id').val(data[0]);
         $('#modal_editar_detalle #fechavencimiento').val(data[5]);
         $('#modal_editar_detalle').modal('show');
-        $("#modal_editar_detalle #producto").val(data[0]).trigger('change');
+        $("#modal_editar_detalle #producto").val(data[0]);
+        $("#modal_editar_detalle #producto_descripcion").val(data[4]);
     });
 
 

@@ -61,10 +61,8 @@ class NotaIngresoController extends Controller
         $fecha_5 = date("Y-m-d",strtotime($fecha_hoy."+ 5 years"));
         $origenes =  General::find(28)->detalles;
         $destinos =  General::find(29)->detalles;
-        $lotes = DB::table('lote_productos')->get();
         $ngenerado = $fecha . (DB::table('nota_ingreso')->count() + 1);
         $usuarios = User::get();
-        $productos = Producto::where('estado', 'ACTIVO')->get();
         $monedas =  tipos_moneda();
         return view('almacenes.nota_ingresos.create', [
             "fecha_hoy" => $fecha_hoy,
@@ -72,7 +70,6 @@ class NotaIngresoController extends Controller
             "fecha_5" => $fecha_5,
             "origenes" => $origenes, 'destinos' => $destinos,
             'ngenerado' => $ngenerado, 'usuarios' => $usuarios,
-            'productos' => $productos, 'lotes' => $lotes,
             'monedas' => $monedas
         ]);
     }
@@ -321,7 +318,6 @@ class NotaIngresoController extends Controller
         $destinos =  General::find(29)->detalles;
         $lotes = DB::table('lote_productos')->get();
         $usuarios = User::get();
-        $productos = Producto::where('estado', 'ACTIVO')->get();
         $monedas =  tipos_moneda();
         return view('almacenes.nota_ingresos.edit', [
             "fecha_hoy" => $fecha_hoy,
@@ -330,7 +326,6 @@ class NotaIngresoController extends Controller
             "origenes" => $origenes,
             'destinos' => $destinos,
             'usuarios' => $usuarios,
-            'productos' => $productos,
             'lotes' => $lotes,
             'monedas' => $monedas,
             'notaingreso' => $notaingreso,

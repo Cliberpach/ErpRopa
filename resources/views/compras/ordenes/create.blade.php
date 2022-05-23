@@ -272,20 +272,16 @@
 
                                         <div class="row align-items-end">
 
-                                            <div class="col-10 col-md-3">
+                                            <div class="col-10 col-md-5">
                                                 <div class="form-group">
                                                     <label class="required">Producto</label>
                                                     <select class="select2_form form-control"
                                                         style="text-transform: uppercase; width:100%" name="producto_id"
-                                                        id="producto_id">
+                                                        id="producto_id" onchange="obtenerProducto(this.value)">
                                                     </select>
+                                                    <input type="hidden" value="" id="producto_json" class="form-control">
                                                     <div class="invalid-feedback"><b><span id="error-producto"></span></b>
                                                     </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-2 col-md-2">
-                                                <div class="form-group">
-                                                    <button type="button" class="btn btn-secondary" onclick="obtenerProducts()"><i class="fa fa-refresh"></i></button>
                                                 </div>
                                             </div>
                                             <div class="col-12 col-md-2">
@@ -431,10 +427,12 @@
 <script src="{{asset('Inspinia/js/plugins/dataTables/dataTables.bootstrap4.min.js')}}"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
+
 //Select2
 $(".select2_form").select2({
     placeholder: "SELECCIONAR",
     allowClear: true,
+    height: '200px',
     width: '100%',
 });
 
@@ -473,7 +471,7 @@ $(document).ready(function() {
         ajax: {
             url: route('getProductosSelect'),
             dataType: 'json',
-            type: 'post',
+            type: 'get',
             delay: 250,
             data: function (params) {
                 var query = {
@@ -486,21 +484,61 @@ $(document).ready(function() {
             },
             processResults: function (data, params) {
                 params.page = params.page || 1;
-
                 return {
-                    results: data.results,
+                    results: data.data,
                     pagination: {
-                        more: (params.page * 10) < data.count_filtered
+                        more: data.total
                     }
                 };
             },
             cache: true
         },
         placeholder: 'Buscar producto',
-        minimumInputLength: 1
-    });
+        minimumInputLength: 3,
+        language: {
 
-    obtenerProducts();
+            errorLoading: function () {
+                return 'No se pudo cargar el resultado.';
+            },
+            inputTooLong: function (args) {
+                var overChars = args.input.length - args.maximum;
+                var message = 'Por favor borrar ' + overChars + ' caracteres';
+                if (overChars >= 2 && overChars <= 4) {
+                    message += 'а';
+                } else if (overChars >= 5) {
+                    message += 'ов';
+                }
+                return message;
+            },
+            inputTooShort: function (args) {
+                var remainingChars = args.minimum - args.input.length;
+
+                var message = 'Por favor ingrese ' + remainingChars + ' o mas caracteres';
+
+                return message;
+            },
+            loadingMore: function () {
+                return 'Cargando más recursos...';
+            },
+            maximumSelected: function (args) {
+                var message = 'Puedes elegir ' + args.maximum + ' articulos';
+
+                if (args.maximum  >= 2 && args.maximum <= 4) {
+                    message += 'а';
+                } else if (args.maximum >= 5) {
+                    message += 'ов';
+                }
+
+                return message;
+            },
+            noResults: function () {
+            return 'No hay resultados';
+            },
+            searching: function () {
+            return 'Buscando…';
+            }
+        }
+    });
 });
 
 $("#igv_check").click(function() {
@@ -727,7 +765,8 @@ $(document).on('click', '#editar_producto', function(event) {
     var data = table.row($(this).parents('tr')).data();
 
     $('#indice').val(table.row($(this).parents('tr')).index());
-    $('#producto_id_editar').val(data[0]).trigger('change');
+    $('#producto_id_editar').val(data[0]);
+    $('#producto_editar').val(data[3]);
     $('#presentacion_editar').val(productoPresentacion(data[0]));
     $('#precio_editar').val(data[4]);
     $('#cantidad_editar').val(data[2]);
@@ -777,17 +816,26 @@ $(document).on('click', '#borrar_producto', function(event) {
 $(".enviar_producto").click(function() {
     limpiarErrores()
     var enviar = false;
-    if ($('#producto_id').val() == '') {
-        toastr.error('Seleccione artículo.', 'Error');
-        enviar = true;
-        $('#producto_id').addClass("is-invalid")
-        $('#error-producto').text('El campo Producto es obligatorio.')
-    } else {
+    if ($('#producto_id').val()) {
         var existe = buscarproducto($('#producto_id').val())
         if (existe == true) {
             toastr.error('Producto ya se encuentra ingresado.', 'Error');
             enviar = true;
         }
+    } else {
+        toastr.error('Seleccione producto.', 'Error');
+        enviar = true;
+        $('#producto_id').addClass("is-invalid")
+        $('#error-producto').text('El campo Producto es obligatorio.')
+    }
+
+    if ($('#producto_json').val() == '') {
+
+        toastr.error('Seleccione nuevamente el producto.', 'Error');
+        enviar = true;
+
+        $("#precio").addClass("is-invalid");
+        $('#error-producto').text('Seleccione nuevamente.')
     }
 
     if ($('#precio').val() == '') {
@@ -828,10 +876,10 @@ $(".enviar_producto").click(function() {
             cancelButtonText: "No, Cancelar",
         }).then((result) => {
             if (result.isConfirmed) {
-                var descripcion_producto = obtenerproducto($('#producto_id').val())
+                var producto = JSON.parse($('#producto_json').val());
                 var detalle = {
                     producto_id: $('#producto_id').val(),
-                    descripcion: descripcion_producto,
+                    descripcion: producto.nombre,
                     precio: precio,
                     cantidad: $('#cantidad').val(),
                 }
@@ -857,9 +905,10 @@ $(".enviar_producto").click(function() {
 
 function limpiarDetalle() {
     $('#presentacion').val('')
+    $('#producto_json').val('')
     $('#precio').val('')
     $('#cantidad').val('')
-    $('#producto_id').val($('#producto_id option:first-child').val()).trigger('change');
+    $('#producto_id').val('').trigger('change');
 
 }
 
@@ -890,26 +939,16 @@ function agregarTabla($detalle) {
 
 }
 
-
-function obtenerproducto($id) {
-    var producto = ""
-    @foreach($productos as $producto)
-    if ("{{$producto->id}}" == $id) {
-        producto = "{{$producto->nombre}}"
+function obtenerProducto(id) {
+    if(id != '') {
+        var url = '{{ route("almacenes.producto.obtenerProducto", ":id") }}';
+        url = url.replace(":id", id);
+        axios.get(url).then(response => {
+            $("#producto_json").val(JSON.stringify(response.data.producto));
+        })
     }
-    @endforeach
-    return producto;
 }
 
-function obtenerPresentacion($descripcion) {
-    var presentacion = ""
-    @foreach($presentaciones as $presentacion)
-    if ("{{$presentacion->descripcion}}" == $descripcion) {
-        presentacion = "{{$presentacion->simbolo}}"
-    }
-    @endforeach
-    return presentacion;
-}
 function buscarproducto(id) {
     var existe = false;
     var t = $('.dataTables-orden-detalle').DataTable();
@@ -949,13 +988,13 @@ function registrosproductos() {
 }
 
 function productoPresentacion(producto) {
-    var presentacion = ""
-    @foreach($productos as $producto)
-    if ("{{$producto->id}}" == producto) {
-        presentacion = "{{$producto->presentacion}}"
+    if(producto != '') {
+        var url = '{{ route("almacenes.producto.obtenerProducto", ":id") }}';
+        url = url.replace(":id", producto);
+        axios.get(url).then(response => {
+            return response.data.producto.presentacion;
+        })
     }
-    @endforeach
-    return presentacion
 }
 
 function sumaTotal() {
@@ -1016,34 +1055,5 @@ $(document).on("change", "#proveedor_id", function () {
    }
 
 });
-
-    function obtenerProducts()
-    {
-        /*$('#panel_detalle').children('.ibox-content').toggleClass('sk-loading');
-        $("#producto_id").empty().trigger('change');
-        
-        axios.get('{{ route('compras.documento.getProduct') }}').then(response => {
-            let data = response.data.data
-            console.log(data)
-            if (data.length > 0) {
-                $('#producto_id').append('<option></option>').trigger('change');
-                for(var i = 0;i < data.length; i++)
-                {
-                    let codigo = data[i].codigo_barra ? (' - ' + data[i].codigo_barra) : '';
-                    var newOption = '<option value="'+data[i].id+'" peso="'+data[i].peso_producto+'" unidad="'+data[i].medida_desc+'" descripcion="'+data[i].nombre+'">'+data[i].nombre + codigo + '</option>';
-                    $('#producto_id').append(newOption).trigger('change');
-                    //departamentos += '<option value="'+result.departamentos[i].id+'">'+result.departamentos[i].nombre+'</option>';
-                }
-
-                $('#panel_detalle').children('.ibox-content').toggleClass('sk-loading');
-
-            } else {
-                $('#panel_detalle').children('.ibox-content').toggleClass('sk-loading');
-                toastr.error('Productos no encontrados.', 'Error');
-            }
-        })*/
-    }
-
-
 </script>
 @endpush

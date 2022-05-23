@@ -17,12 +17,8 @@
                         <div class="col-12">
                             <div class="form-group">
                                 <label class="">Productos</label>
-                                <select name="producto" id="producto" class="form-control select2_form" disabled>
-                                    <option value=""></option>
-                                    @foreach ($productos as $producto)
-                                        <option  value="{{$producto->id}}" id="{{$producto->id}}">{{$producto->nombre}}</option>
-                                    @endforeach
-                                </select>
+                                <input type="hidden" id="producto" class="form-control" disabled>
+                                <input type="text" id="producto_descripcion" class="form-control" disabled>
                                 <input type="hidden" id="producto_anterior">
                             </div>
                         </div>
@@ -173,7 +169,7 @@ function actualizarTabla(i) {
     var detalle = {
         cantidad:   convertFloat($('#modal_editar_detalle #cantidad').val()).toFixed(2),
         lote: $('#modal_editar_detalle #lote').val(),
-        producto: $( "#modal_editar_detalle #producto option:selected" ).text(),
+        producto: $( "#modal_editar_detalle #producto_descripcion" ).val(),
         fechavencimiento: $('#modal_editar_detalle #fechavencimiento').val(),
         producto_id:$( "#modal_editar_detalle #producto" ).val(),
         costo:convertFloat($( "#modal_editar_detalle #costo" ).val()).toFixed(4),
