@@ -184,7 +184,7 @@
                 </tr>
                 @if ($documento->observacion)
                 <tr>
-                    <td>PLACA</td>
+                    <td>O/C</td>
                     <td>:</td>
                     <td class="text-uppercase">{{ $documento->observacion }}</td>
                 </tr>

@@ -75,8 +75,8 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-12 col-md-6" id="fecha_entrega">
-                                        <div class="form-group">
+                                    <div class="col-12 col-md-6" id="fecha_atencion">
+                                        <div class="form-group d-none">
                                             <label class="">Fecha de Atención</label>
                                             <div class="input-group">
                                                 <span class="input-group-addon">
@@ -103,6 +103,18 @@
                                                     </span>
                                                     @endif
                                             </div>
+                                            <div class="form-group">
+                                            <label>O/C:</label>
+                                            <textarea type="text" placeholder=""
+                                                class="form-control {{ $errors->has('observacion') ? ' is-invalid' : '' }}"
+                                                name="observacion" id="observacion" onkeyup="return mayus(this)"
+                                                value="{{ old('observacion') }}">{{ old('observacion') }}</textarea>
+                                            @if ($errors->has('observacion'))
+                                                <span class="invalid-feedback" role="alert">
+                                                    <strong>{{ $errors->first('observacion') }}</strong>
+                                                </span>
+                                            @endif
+                                        </div>
                                         </div>
                                     </div>
                                 </div>
@@ -272,24 +284,6 @@
                                         </div>
                                     </div>
                                 </div>
-
-                                <div class="row d-none">
-                                    <div class="col-12">
-                                        <div class="form-group">
-                                            <label>Observación:</label>
-                                            <textarea type="text" placeholder=""
-                                                class="form-control {{ $errors->has('observacion') ? ' is-invalid' : '' }}"
-                                                name="observacion" id="observacion" onkeyup="return mayus(this)"
-                                                value="{{ old('observacion') }}">{{ old('observacion') }}</textarea>
-                                            @if ($errors->has('observacion'))
-                                                <span class="invalid-feedback" role="alert">
-                                                    <strong>{{ $errors->first('observacion') }}</strong>
-                                                </span>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
-
 
                                 <input type="checkbox" id="igv_check" name="igv_check" class="d-none" checked>
                                 <!-- OBTENER TIPO DE CLIENTE -->

@@ -75,7 +75,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-12 col-md-6" id="fecha_entrega">
+                                    <div class="col-12 col-md-6" id="fecha_atencion">
                                         <div class="form-group d-none">
                                             <label class="">Fecha de Atención</label>
                                             <div class="input-group">
@@ -105,7 +105,7 @@
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label>Placa</label>
+                                            <label>O/C</label>
                                             <input type="text" type="text" placeholder=""
                                             class="form-control {{ $errors->has('observacion') ? ' is-invalid' : '' }}"
                                             name="observacion" id="observacion" onkeyup="return mayus(this)"
