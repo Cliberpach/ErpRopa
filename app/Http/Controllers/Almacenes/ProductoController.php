@@ -211,7 +211,7 @@ class ProductoController extends Controller
 
             $producto->save();
 
-            $producto->codigo = 1000 + $producto->id;
+            $producto->codigo = $producto->id;
             $producto->update();
 
             if ($request->get('codigo_barra')) {
