@@ -190,13 +190,8 @@
                                             type="button"><i class="fa fa-plus"></i></button>
                                         <label class="required">Tipo</label>
                                         <select id="categoria" name="categoria"
-                                            class="autocomplete-producto select2_form form-control {{ $errors->has('familia') ? ' is-invalid' : '' }}">
+                                            class="autocomplete-producto select2_form form-control {{ $errors->has('categoria') ? ' is-invalid' : '' }}">
                                             <option></option>
-                                            @foreach ($categorias as $categoria)
-                                                <option value="{{ $categoria->id }}"
-                                                    {{ old('categoria') == $categoria->id ? 'selected' : '' }}>
-                                                    {{ $categoria->descripcion }}</option>
-                                            @endforeach
                                         </select>
                                         @if ($errors->has('categoria'))
                                             <span class="invalid-feedback" role="alert">
@@ -212,11 +207,6 @@
                                             class="autocomplete-producto select2_form form-control {{ $errors->has('marca') ? ' is-invalid' : '' }}"
                                             required value="{{ old('marca') }}">
                                             <option></option>
-                                            @foreach ($marcas as $marca)
-                                                <option value="{{ $marca->id }}"
-                                                    {{ old('marca') == $marca->id ? 'selected' : '' }}>
-                                                    {{ $marca->marca }}</option>
-                                            @endforeach
                                         </select>
                                         @if ($errors->has('marca'))
                                             <span class="invalid-feedback" role="alert">
@@ -261,11 +251,6 @@
                                             style="text-transform: uppercase; width:100%" name="modelo_id"
                                             id="modelo_id">
                                             <option></option>
-                                            @foreach (getModelos() as $value)
-                                                <option value="{{ $value->id }}">
-                                                    {{ $value->nombre }}
-                                                </option>
-                                            @endforeach
                                         </select>
                                     </div>
                                     <div class="form-group col-lg-6 col-xs-12">
@@ -275,11 +260,6 @@
                                         <select class="autocomplete-producto select2_form form-control"
                                             style="text-transform: uppercase; width:100%" name="tela_id" id="tela_id">
                                             <option></option>
-                                            @foreach (getTelas() as $value)
-                                                <option value="{{ $value->id }}">
-                                                    {{ $value->nombre }}
-                                                </option>
-                                            @endforeach
                                         </select>
                                     </div>
                                     <div class="form-group col-lg-6 col-xs-12">
@@ -289,11 +269,6 @@
                                         <select class="autocomplete-producto select2_form form-control"
                                             style="text-transform: uppercase; width:100%" name="color_id" id="color_id">
                                             <option></option>
-                                            @foreach (getColores() as $value)
-                                                <option value="{{ $value->id }}">
-                                                    {{ $value->nombre }}
-                                                </option>
-                                            @endforeach
                                         </select>
                                     </div>
                                     <div class="form-group col-lg-6 col-xs-12">
@@ -303,11 +278,6 @@
                                         <select class="autocomplete-producto select2_form form-control"
                                             style="text-transform: uppercase; width:100%" name="talla_id" id="talla_id">
                                             <option></option>
-                                            @foreach (getTallas() as $value)
-                                                <option value="{{ $value->id }}">
-                                                    {{ $value->nombre }}
-                                                </option>
-                                            @endforeach
                                         </select>
                                     </div>
                                     <div class="form-group col-lg-6 col-xs-12">
@@ -318,11 +288,6 @@
                                             style="text-transform: uppercase; width:100%" name="sub_modelo_id"
                                             id="sub_modelo_id">
                                             <option></option>
-                                            @foreach (getSubModelos() as $value)
-                                                <option value="{{ $value->id }}">
-                                                    {{ $value->nombre }}
-                                                </option>
-                                            @endforeach
                                         </select>
                                     </div>
                                     <div class="form-group col-lg-6 col-xs-12">
@@ -333,11 +298,6 @@
                                             style="text-transform: uppercase; width:100%" name="temporada_id"
                                             id="temporada_id">
                                             <option></option>
-                                            @foreach (getTemporadas() as $value)
-                                                <option value="{{ $value->id }}">
-                                                    {{ $value->nombre }}
-                                                </option>
-                                            @endforeach
                                         </select>
                                     </div>
                                     <div class="form-group col-lg-6 col-xs-12">
@@ -348,11 +308,6 @@
                                             style="text-transform: uppercase; width:100%" name="genero_id"
                                             id="genero_id">
                                             <option></option>
-                                            @foreach (getGeneros() as $value)
-                                                <option value="{{ $value->id }}">
-                                                    {{ $value->nombre }}
-                                                </option>
-                                            @endforeach
                                         </select>
                                     </div>
                                 </div>
@@ -574,6 +529,638 @@
                     )
                 }
             })
+        });
+
+        $('#categoria').select2({
+            ajax: {
+                url: route('almacenes.categoria.getListSelect'),
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    var query = {
+                        search: params.term,
+                        type: 'public'
+                    }
+
+                    // Query parameters will be ?search=[term]&type=public
+                    return query;
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.data,
+                        pagination: {
+                            more: data.total
+                        }
+                    };
+                },
+                cache: true,
+            },
+            allowClear: true,
+            placeholder: 'Seleccionar',
+            language: {
+
+                errorLoading: function () {
+                    return 'No se pudo cargar el resultado.';
+                },
+                inputTooLong: function (args) {
+                    var overChars = args.input.length - args.maximum;
+                    var message = 'Por favor borrar ' + overChars + ' caracteres';
+                    if (overChars >= 2 && overChars <= 4) {
+                        message += 'а';
+                    } else if (overChars >= 5) {
+                        message += 'ов';
+                    }
+                    return message;
+                },
+                inputTooShort: function (args) {
+                    var remainingChars = args.minimum - args.input.length;
+
+                    var message = 'Por favor ingrese ' + remainingChars + ' o mas caracteres';
+
+                    return message;
+                },
+                loadingMore: function () {
+                    return 'Cargando más recursos...';
+                },
+                maximumSelected: function (args) {
+                    var message = 'Puedes elegir ' + args.maximum + ' articulos';
+
+                    if (args.maximum  >= 2 && args.maximum <= 4) {
+                        message += 'а';
+                    } else if (args.maximum >= 5) {
+                        message += 'ов';
+                    }
+
+                    return message;
+                },
+                noResults: function () {
+                return 'No hay resultados';
+                },
+                searching: function () {
+                return 'Buscando…';
+                }
+            }
+        });
+
+        $('#marca').select2({
+            ajax: {
+                url: route('almacenes.marca.getListSelect'),
+                dataType: 'json',
+                data: function (params) {
+                    var query = {
+                        search: params.term,
+                        type: 'public'
+                    }
+
+                    // Query parameters will be ?search=[term]&type=public
+                    return query;
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.data,
+                        pagination: {
+                            more: data.total
+                        }
+                    };
+                }
+            },
+            allowClear: true,
+            placeholder: 'Seleccionar',
+            language: {
+
+                errorLoading: function () {
+                    return 'No se pudo cargar el resultado.';
+                },
+                inputTooLong: function (args) {
+                    var overChars = args.input.length - args.maximum;
+                    var message = 'Por favor borrar ' + overChars + ' caracteres';
+                    if (overChars >= 2 && overChars <= 4) {
+                        message += 'а';
+                    } else if (overChars >= 5) {
+                        message += 'ов';
+                    }
+                    return message;
+                },
+                inputTooShort: function (args) {
+                    var remainingChars = args.minimum - args.input.length;
+
+                    var message = 'Por favor ingrese ' + remainingChars + ' o mas caracteres';
+
+                    return message;
+                },
+                loadingMore: function () {
+                    return 'Cargando más recursos...';
+                },
+                maximumSelected: function (args) {
+                    var message = 'Puedes elegir ' + args.maximum + ' articulos';
+
+                    if (args.maximum  >= 2 && args.maximum <= 4) {
+                        message += 'а';
+                    } else if (args.maximum >= 5) {
+                        message += 'ов';
+                    }
+
+                    return message;
+                },
+                noResults: function () {
+                return 'No hay resultados';
+                },
+                searching: function () {
+                return 'Buscando…';
+                }
+            }
+        });
+
+        $('#color_id').select2({
+            ajax: {
+                url: route('almacenes.color.getListSelect'),
+                dataType: 'json',
+                data: function (params) {
+                    var query = {
+                        search: params.term,
+                        type: 'public'
+                    }
+
+                    // Query parameters will be ?search=[term]&type=public
+                    return query;
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.data,
+                        pagination: {
+                            more: data.total
+                        }
+                    };
+                }
+            },
+            allowClear: true,
+            placeholder: 'Seleccionar',
+            language: {
+
+                errorLoading: function () {
+                    return 'No se pudo cargar el resultado.';
+                },
+                inputTooLong: function (args) {
+                    var overChars = args.input.length - args.maximum;
+                    var message = 'Por favor borrar ' + overChars + ' caracteres';
+                    if (overChars >= 2 && overChars <= 4) {
+                        message += 'а';
+                    } else if (overChars >= 5) {
+                        message += 'ов';
+                    }
+                    return message;
+                },
+                inputTooShort: function (args) {
+                    var remainingChars = args.minimum - args.input.length;
+
+                    var message = 'Por favor ingrese ' + remainingChars + ' o mas caracteres';
+
+                    return message;
+                },
+                loadingMore: function () {
+                    return 'Cargando más recursos...';
+                },
+                maximumSelected: function (args) {
+                    var message = 'Puedes elegir ' + args.maximum + ' articulos';
+
+                    if (args.maximum  >= 2 && args.maximum <= 4) {
+                        message += 'а';
+                    } else if (args.maximum >= 5) {
+                        message += 'ов';
+                    }
+
+                    return message;
+                },
+                noResults: function () {
+                return 'No hay resultados';
+                },
+                searching: function () {
+                return 'Buscando…';
+                }
+            }
+        });
+
+        $('#modelo_id').select2({            
+            allowClear: true,
+            ajax: {
+                url: route('almacenes.modelo.getListSelect'),
+                dataType: 'json',
+                data: function (params) {
+                    var query = {
+                        search: params.term,
+                        type: 'public'
+                    }
+
+                    // Query parameters will be ?search=[term]&type=public
+                    return query;
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.data,
+                        pagination: {
+                            more: data.total
+                        }
+                    };
+                }
+            },
+            placeholder: 'Seleccionar',
+            language: {
+
+                errorLoading: function () {
+                    return 'No se pudo cargar el resultado.';
+                },
+                inputTooLong: function (args) {
+                    var overChars = args.input.length - args.maximum;
+                    var message = 'Por favor borrar ' + overChars + ' caracteres';
+                    if (overChars >= 2 && overChars <= 4) {
+                        message += 'а';
+                    } else if (overChars >= 5) {
+                        message += 'ов';
+                    }
+                    return message;
+                },
+                inputTooShort: function (args) {
+                    var remainingChars = args.minimum - args.input.length;
+
+                    var message = 'Por favor ingrese ' + remainingChars + ' o mas caracteres';
+
+                    return message;
+                },
+                loadingMore: function () {
+                    return 'Cargando más recursos...';
+                },
+                maximumSelected: function (args) {
+                    var message = 'Puedes elegir ' + args.maximum + ' articulos';
+
+                    if (args.maximum  >= 2 && args.maximum <= 4) {
+                        message += 'а';
+                    } else if (args.maximum >= 5) {
+                        message += 'ов';
+                    }
+
+                    return message;
+                },
+                noResults: function () {
+                return 'No hay resultados';
+                },
+                searching: function () {
+                return 'Buscando…';
+                }
+            }
+        });
+
+        $('#tela_id').select2({            
+            allowClear: true,
+            ajax: {
+                url: route('almacenes.tela.getListSelect'),
+                dataType: 'json',
+                data: function (params) {
+                    var query = {
+                        search: params.term,
+                        type: 'public'
+                    }
+
+                    // Query parameters will be ?search=[term]&type=public
+                    return query;
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.data,
+                        pagination: {
+                            more: data.total
+                        }
+                    };
+                }
+            },
+            placeholder: 'Seleccionar',
+            language: {
+
+                errorLoading: function () {
+                    return 'No se pudo cargar el resultado.';
+                },
+                inputTooLong: function (args) {
+                    var overChars = args.input.length - args.maximum;
+                    var message = 'Por favor borrar ' + overChars + ' caracteres';
+                    if (overChars >= 2 && overChars <= 4) {
+                        message += 'а';
+                    } else if (overChars >= 5) {
+                        message += 'ов';
+                    }
+                    return message;
+                },
+                inputTooShort: function (args) {
+                    var remainingChars = args.minimum - args.input.length;
+
+                    var message = 'Por favor ingrese ' + remainingChars + ' o mas caracteres';
+
+                    return message;
+                },
+                loadingMore: function () {
+                    return 'Cargando más recursos...';
+                },
+                maximumSelected: function (args) {
+                    var message = 'Puedes elegir ' + args.maximum + ' articulos';
+
+                    if (args.maximum  >= 2 && args.maximum <= 4) {
+                        message += 'а';
+                    } else if (args.maximum >= 5) {
+                        message += 'ов';
+                    }
+
+                    return message;
+                },
+                noResults: function () {
+                return 'No hay resultados';
+                },
+                searching: function () {
+                return 'Buscando…';
+                }
+            }
+        });
+
+        $('#talla_id').select2({            
+            allowClear: true,
+            ajax: {
+                url: route('almacenes.talla.getListSelect'),
+                dataType: 'json',
+                data: function (params) {
+                    var query = {
+                        search: params.term,
+                        type: 'public'
+                    }
+
+                    // Query parameters will be ?search=[term]&type=public
+                    return query;
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.data,
+                        pagination: {
+                            more: data.total
+                        }
+                    };
+                }
+            },
+            placeholder: 'Seleccionar',
+            language: {
+
+                errorLoading: function () {
+                    return 'No se pudo cargar el resultado.';
+                },
+                inputTooLong: function (args) {
+                    var overChars = args.input.length - args.maximum;
+                    var message = 'Por favor borrar ' + overChars + ' caracteres';
+                    if (overChars >= 2 && overChars <= 4) {
+                        message += 'а';
+                    } else if (overChars >= 5) {
+                        message += 'ов';
+                    }
+                    return message;
+                },
+                inputTooShort: function (args) {
+                    var remainingChars = args.minimum - args.input.length;
+
+                    var message = 'Por favor ingrese ' + remainingChars + ' o mas caracteres';
+
+                    return message;
+                },
+                loadingMore: function () {
+                    return 'Cargando más recursos...';
+                },
+                maximumSelected: function (args) {
+                    var message = 'Puedes elegir ' + args.maximum + ' articulos';
+
+                    if (args.maximum  >= 2 && args.maximum <= 4) {
+                        message += 'а';
+                    } else if (args.maximum >= 5) {
+                        message += 'ов';
+                    }
+
+                    return message;
+                },
+                noResults: function () {
+                return 'No hay resultados';
+                },
+                searching: function () {
+                return 'Buscando…';
+                }
+            }
+        });
+
+        $('#sub_modelo_id').select2({            
+            allowClear: true,
+            ajax: {
+                url: route('almacenes.submodelo.getListSelect'),
+                dataType: 'json',
+                data: function (params) {
+                    var query = {
+                        search: params.term,
+                        type: 'public'
+                    }
+
+                    // Query parameters will be ?search=[term]&type=public
+                    return query;
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.data,
+                        pagination: {
+                            more: data.total
+                        }
+                    };
+                }
+            },
+            placeholder: 'Seleccionar',
+            language: {
+
+                errorLoading: function () {
+                    return 'No se pudo cargar el resultado.';
+                },
+                inputTooLong: function (args) {
+                    var overChars = args.input.length - args.maximum;
+                    var message = 'Por favor borrar ' + overChars + ' caracteres';
+                    if (overChars >= 2 && overChars <= 4) {
+                        message += 'а';
+                    } else if (overChars >= 5) {
+                        message += 'ов';
+                    }
+                    return message;
+                },
+                inputTooShort: function (args) {
+                    var remainingChars = args.minimum - args.input.length;
+
+                    var message = 'Por favor ingrese ' + remainingChars + ' o mas caracteres';
+
+                    return message;
+                },
+                loadingMore: function () {
+                    return 'Cargando más recursos...';
+                },
+                maximumSelected: function (args) {
+                    var message = 'Puedes elegir ' + args.maximum + ' articulos';
+
+                    if (args.maximum  >= 2 && args.maximum <= 4) {
+                        message += 'а';
+                    } else if (args.maximum >= 5) {
+                        message += 'ов';
+                    }
+
+                    return message;
+                },
+                noResults: function () {
+                return 'No hay resultados';
+                },
+                searching: function () {
+                return 'Buscando…';
+                }
+            }
+        });
+
+        $('#temporada_id').select2({            
+            allowClear: true,
+            ajax: {
+                url: route('almacenes.temporada.getListSelect'),
+                dataType: 'json',
+                data: function (params) {
+                    var query = {
+                        search: params.term,
+                        type: 'public'
+                    }
+
+                    // Query parameters will be ?search=[term]&type=public
+                    return query;
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.data,
+                        pagination: {
+                            more: data.total
+                        }
+                    };
+                }
+            },
+            placeholder: 'Seleccionar',
+            language: {
+
+                errorLoading: function () {
+                    return 'No se pudo cargar el resultado.';
+                },
+                inputTooLong: function (args) {
+                    var overChars = args.input.length - args.maximum;
+                    var message = 'Por favor borrar ' + overChars + ' caracteres';
+                    if (overChars >= 2 && overChars <= 4) {
+                        message += 'а';
+                    } else if (overChars >= 5) {
+                        message += 'ов';
+                    }
+                    return message;
+                },
+                inputTooShort: function (args) {
+                    var remainingChars = args.minimum - args.input.length;
+
+                    var message = 'Por favor ingrese ' + remainingChars + ' o mas caracteres';
+
+                    return message;
+                },
+                loadingMore: function () {
+                    return 'Cargando más recursos...';
+                },
+                maximumSelected: function (args) {
+                    var message = 'Puedes elegir ' + args.maximum + ' articulos';
+
+                    if (args.maximum  >= 2 && args.maximum <= 4) {
+                        message += 'а';
+                    } else if (args.maximum >= 5) {
+                        message += 'ов';
+                    }
+
+                    return message;
+                },
+                noResults: function () {
+                return 'No hay resultados';
+                },
+                searching: function () {
+                return 'Buscando…';
+                }
+            }
+        });
+
+        $('#genero_id').select2({            
+            allowClear: true,
+            ajax: {
+                url: route('almacenes.genero.getListSelect'),
+                dataType: 'json',
+                data: function (params) {
+                    var query = {
+                        search: params.term,
+                        type: 'public'
+                    }
+
+                    // Query parameters will be ?search=[term]&type=public
+                    return query;
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.data,
+                        pagination: {
+                            more: data.total
+                        }
+                    };
+                }
+            },
+            placeholder: 'Seleccionar',
+            language: {
+
+                errorLoading: function () {
+                    return 'No se pudo cargar el resultado.';
+                },
+                inputTooLong: function (args) {
+                    var overChars = args.input.length - args.maximum;
+                    var message = 'Por favor borrar ' + overChars + ' caracteres';
+                    if (overChars >= 2 && overChars <= 4) {
+                        message += 'а';
+                    } else if (overChars >= 5) {
+                        message += 'ов';
+                    }
+                    return message;
+                },
+                inputTooShort: function (args) {
+                    var remainingChars = args.minimum - args.input.length;
+
+                    var message = 'Por favor ingrese ' + remainingChars + ' o mas caracteres';
+
+                    return message;
+                },
+                loadingMore: function () {
+                    return 'Cargando más recursos...';
+                },
+                maximumSelected: function (args) {
+                    var message = 'Puedes elegir ' + args.maximum + ' articulos';
+
+                    if (args.maximum  >= 2 && args.maximum <= 4) {
+                        message += 'а';
+                    } else if (args.maximum >= 5) {
+                        message += 'ов';
+                    }
+
+                    return message;
+                },
+                noResults: function () {
+                return 'No hay resultados';
+                },
+                searching: function () {
+                return 'Buscando…';
+                }
+            }
         });
     });
 
