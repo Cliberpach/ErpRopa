@@ -254,15 +254,6 @@
                                         </select>
                                     </div>
                                     <div class="form-group col-lg-6 col-xs-12">
-                                        <button class="btn btn-sm btn-primary" id="btn_tela_modal_create"
-                                            type="button"><i class="fa fa-plus"></i></button>
-                                        <label for="" class="required">Telas</label>
-                                        <select class="autocomplete-producto select2_form form-control"
-                                            style="text-transform: uppercase; width:100%" name="tela_id" id="tela_id">
-                                            <option></option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group col-lg-6 col-xs-12">
                                         <button class="btn btn-sm btn-primary" id="btn_color_modal_create"
                                             type="button"><i class="fa fa-plus"></i></button>
                                         <label for="" class="required">Colores</label>
@@ -277,6 +268,15 @@
                                         <label for="" class="required">Tallas</label>
                                         <select class="autocomplete-producto select2_form form-control"
                                             style="text-transform: uppercase; width:100%" name="talla_id" id="talla_id">
+                                            <option></option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-lg-6 col-xs-12">
+                                        <button class="btn btn-sm btn-primary" id="btn_tela_modal_create"
+                                            type="button"><i class="fa fa-plus"></i></button>
+                                        <label for="" class="required">Telas</label>
+                                        <select class="autocomplete-producto select2_form form-control"
+                                            style="text-transform: uppercase; width:100%" name="tela_id" id="tela_id">
                                             <option></option>
                                         </select>
                                     </div>
@@ -743,7 +743,7 @@
             }
         });
 
-        $('#modelo_id').select2({            
+        $('#modelo_id').select2({
             allowClear: true,
             ajax: {
                 url: route('almacenes.modelo.getListSelect'),
@@ -813,7 +813,7 @@
             }
         });
 
-        $('#tela_id').select2({            
+        $('#tela_id').select2({
             allowClear: true,
             ajax: {
                 url: route('almacenes.tela.getListSelect'),
@@ -883,7 +883,7 @@
             }
         });
 
-        $('#talla_id').select2({            
+        $('#talla_id').select2({
             allowClear: true,
             ajax: {
                 url: route('almacenes.talla.getListSelect'),
@@ -953,7 +953,7 @@
             }
         });
 
-        $('#sub_modelo_id').select2({            
+        $('#sub_modelo_id').select2({
             allowClear: true,
             ajax: {
                 url: route('almacenes.submodelo.getListSelect'),
@@ -1023,7 +1023,7 @@
             }
         });
 
-        $('#temporada_id').select2({            
+        $('#temporada_id').select2({
             allowClear: true,
             ajax: {
                 url: route('almacenes.temporada.getListSelect'),
@@ -1093,7 +1093,7 @@
             }
         });
 
-        $('#genero_id').select2({            
+        $('#genero_id').select2({
             allowClear: true,
             ajax: {
                 url: route('almacenes.genero.getListSelect'),

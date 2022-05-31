@@ -284,21 +284,6 @@
                                         </select>
                                     </div>
                                     <div class="form-group col-lg-6 col-xs-12">
-                                        <button class="btn btn-sm btn-primary" id="btn_tela_modal_create"
-                                        type="button"><i class="fa fa-plus"></i></button>
-                                        <label for="" class="required">Telas</label>
-                                        <select class="autocomplete-producto select2_form form-control"
-                                            style="text-transform: uppercase; width:100%" name="tela_id" id="tela_id">
-                                            <option></option>
-                                            @foreach (getTelas() as $value)
-                                                <option value="{{ $value->id }}"
-                                                    {{ old('tela_id', $producto->tela_id) == $value->id ? 'selected' : '' }}>
-                                                    {{ $value->nombre }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="form-group col-lg-6 col-xs-12">
                                         <label for="" class="required">Colores</label>
                                         <button class="btn btn-sm btn-primary" id="btn_color_modal_create"
                                             type="button"><i class="fa fa-plus"></i></button>
@@ -323,6 +308,21 @@
                                             @foreach (getTallas() as $value)
                                                 <option value="{{ $value->id }}"
                                                     {{ old('talla_id', $producto->talla_id) == $value->id ? 'selected' : '' }}>
+                                                    {{ $value->nombre }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-lg-6 col-xs-12">
+                                        <button class="btn btn-sm btn-primary" id="btn_tela_modal_create"
+                                        type="button"><i class="fa fa-plus"></i></button>
+                                        <label for="" class="required">Telas</label>
+                                        <select class="autocomplete-producto select2_form form-control"
+                                            style="text-transform: uppercase; width:100%" name="tela_id" id="tela_id">
+                                            <option></option>
+                                            @foreach (getTelas() as $value)
+                                                <option value="{{ $value->id }}"
+                                                    {{ old('tela_id', $producto->tela_id) == $value->id ? 'selected' : '' }}>
                                                     {{ $value->nombre }}
                                                 </option>
                                             @endforeach
