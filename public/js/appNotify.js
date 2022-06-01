@@ -70162,15 +70162,15 @@ window.Echo = new laravel_echo__WEBPACK_IMPORTED_MODULE_0__["default"]({
   enabledTransports: ['ws', 'wss'] //forceTLS:false,
 
 });
-/*En el local
-window.Echo = new Echo({
-    broadcaster: 'pusher',
-    key: 'ASDASF2121',
-    wsHost: window.location.hostname,
-    wsPort: 6001,
-    forceTLS:false,
-    disableStats: true,
-});*/
+/*En el local*/
+// window.Echo = new Echo({
+//     broadcaster: 'pusher',
+//     key: 'ASDASF2121',
+//     wsHost: window.location.hostname,
+//     wsPort: 6001,
+//     forceTLS:false,
+//     disableStats: true,
+// });
 
 /***/ }),
 

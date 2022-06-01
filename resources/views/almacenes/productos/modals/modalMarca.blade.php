@@ -44,7 +44,7 @@
                 toastr.error("Ingrese todo los datos", "Error");
                 create = false;
             } else {
-                await axios.post(route("almacenes.marca.exist", {
+                await axios.post(route("almacenes.marcas.exist", {
                     _token: $('input[name=_token]').val(),
                     marca: marca,
                     id: ""
@@ -57,7 +57,7 @@
                 })
             }
             if (create) {
-                await axios.post(route('almacenes.marca.storeApi'), {
+                await axios.post(route('almacenes.marcas.storeApi'), {
                     _token: $('input[name=_token]').val(),
                     marca: marca
                 }).then((value) => {

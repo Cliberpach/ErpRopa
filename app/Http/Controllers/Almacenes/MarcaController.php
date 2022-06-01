@@ -143,7 +143,7 @@ class MarcaController extends Controller
         DB::beginTransaction();
         try {
             $marca = new Marca();
-            $marca->nombre = $request->nombre;
+            $marca->marca = $request->marca;
             $marca->save();
             DB::commit();
             return array("success" => true, "data" => $marca, "response" => "Registro con Exito");
