@@ -20,6 +20,7 @@
                             <thead>
                             <tr>
                                 <th class="text-center" hidden></th>
+                                <th class="text-center">Codigo</th>
                                 <th class="text-center">PRODUCTO</th>
                                 <th class="text-center">UM</th>
                                 <th class="text-center">CATEGORIA</th>
@@ -153,6 +154,7 @@
             "ajax": url,
             "columns": [
                 {data: 'id', className: "text-center letrapequeña", name:"lote_productos.id" ,visible: false, sWidth: '0%'},
+                {data: 'codigo', className: "text-left letrapequeña", name:"productos.codigo", sWidth: '10%' },
                 {data: 'nombre', className: "text-left letrapequeña", name:"productos.nombre", sWidth: '35%' },
                 {data: 'unidad_producto', className: "text-center letrapequeña", name:"tabladetalles.simbolo", sWidth: '5%' },
                 {data: 'categoria', className: "text-center letrapequeña", name:"categorias.descripcion", sWidth: '15%' },

@@ -1572,7 +1572,7 @@ class DocumentoController extends Controller
                 $documento->update();
                 return array('success' => false, 'mensaje' => 'Ya tiene QR');
             }
-            
+
             if ($documento->sunat_contingencia == '0' && $documento->contingencia == '1') {
                 $miQr = QrCode::format('svg')
                     ->size(130)  //defino el tamaño
@@ -2026,6 +2026,7 @@ class DocumentoController extends Controller
                     'nota_ingreso.dolar as dolar_ingreso',
                     'compra_documento_detalles.precio_mas_igv_soles',
                     'lote_productos.*',
+                    'productos.codigo',
                     'productos.nombre',
                     'productos.igv',
                     'productos.codigo_barra',
