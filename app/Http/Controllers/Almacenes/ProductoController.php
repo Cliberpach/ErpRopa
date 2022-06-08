@@ -97,7 +97,7 @@ class ProductoController extends Controller
         if($request->genero_id)
         {
             $consulta = $consulta->where('productos.genero_id',$request->genero_id);
-        }        
+        }
 
         return datatables()->query(
             $consulta
@@ -149,7 +149,7 @@ class ProductoController extends Controller
             // })],
             'codigo_barra' => ['nullable', Rule::unique('productos', 'codigo_barra')->where(function ($query) {
                 $query->whereIn('estado', ["ACTIVO"]);
-            }), 'min:4', 'max:20'],
+            }), 'min:4', 'max:40'],
             'nombre' => 'required',
             'marca' => 'required',
             'categoria' => 'required',
@@ -163,8 +163,8 @@ class ProductoController extends Controller
 
         $message = [
             'codigo_barra.unique' => 'El campo Código de Barra debe de ser único.',
-            'codigo_barra.min' => 'El campo Código de Barra debe de tener almenos 8 caracteres.',
-            'codigo_barra.max' => 'El campo Código de Barra debe de tener solo 8 caracteres.',
+            'codigo_barra.min' => 'El campo Código de Barra debe de tener almenos 4 caracteres.',
+            'codigo_barra.max' => 'El campo Código de Barra debe de tener solo 40 caracteres.',
             'linea_comercial.required' => 'El campo Linea Comercial es obligatorio',
             // 'codigo.unique' => 'El campo Código debe ser único',
             // 'codigo.max:50' => 'El campo Código debe tener como máximo 50 caracteres',
@@ -283,7 +283,7 @@ class ProductoController extends Controller
             // })->ignore($id)],
             'codigo_barra' => ['nullable', Rule::unique('productos', 'codigo_barra')->where(function ($query) {
                 $query->whereIn('estado', ["ACTIVO"]);
-            })->ignore($id), 'min:4', 'max:20'],
+            })->ignore($id), 'min:4', 'max:40'],
             'nombre' => 'required',
             'almacen' => 'required',
             'marca' => 'required',
@@ -295,8 +295,8 @@ class ProductoController extends Controller
 
         $message = [
             'codigo_barra.unique' => 'El campo Código de barra debe ser único',
-            'codigo_barra.min' => 'El campo Código de Barra debe de tener almenos 8 caracteres.',
-            'codigo_barra.max' => 'El campo Código de Barra debe de tener solo 8 caracteres.',
+            'codigo_barra.min' => 'El campo Código de Barra debe de tener almenos 4 caracteres.',
+            'codigo_barra.max' => 'El campo Código de Barra debe de tener solo 40 caracteres.',
             'nombre.required' => 'El campo Descripción del Producto es obligatorio',
             'almacen.required' => 'El campo Almacén es obligatorio',
             'marca.required' => 'El campo Marca es obligatorio',
